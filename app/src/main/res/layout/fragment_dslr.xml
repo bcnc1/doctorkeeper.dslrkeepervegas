@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        android:background="@color/black"
+        android:src="@drawable/dslr_head" />
+
+<!--    <ImageButton-->
+<!--        android:id="@+id/btn_search_doctor_dslr"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="2dp"-->
+<!--        android:background="@null"-->
+<!--        android:src="@drawable/btn_doctor" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/doctor_name_dslr"-->
+<!--        android:layout_width="255dp"-->
+<!--        android:layout_height="27dp"-->
+<!--        android:layout_marginLeft="5dp"-->
+<!--        android:layout_marginRight="150dp"-->
+<!--        android:layout_marginBottom="6dp"-->
+<!--        android:layout_toLeftOf="@id/btn_search_doctor_dslr"-->
+<!--        android:autoSizeTextType="uniform"-->
+<!--        android:fontFamily="@font/danjung"-->
+<!--        android:gravity="left"-->
+<!--        android:text="의사명"-->
+<!--        android:textColor="@color/whitesmoke" />-->
+
+    <FrameLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="@color/white">
+          <ImageView
+              android:id="@+id/patient_space"
+              android:layout_width="match_parent"
+              android:layout_height="100dp"
+              android:paddingTop="20dp"
+              android:paddingBottom="10dp"
+              android:background="@color/lightgrey"
+              tools:ignore="MissingConstraints" />
+          <TextView
+              android:id="@+id/dslr_upload_Notice"
+              android:layout_width="6dp"
+              android:layout_height="6dp"
+              android:text="Reading Image..."
+              android:textSize="30sp"
+              android:visibility="gone"
+              tools:ignore="MissingConstraints" />
+
+          <TextView
+              android:id="@+id/dslr_camera_ready_Notice"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="8dp"
+              android:layout_marginTop="8dp"
+              android:layout_marginEnd="8dp"
+              android:layout_marginBottom="8dp"
+              android:text=""
+              android:textSize="30sp"
+              android:visibility="gone"
+              app:layout_constraintBottom_toTopOf="@+id/dslr_description_notice"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent" />
+
+
+
+          <TextView
+              android:id="@+id/dslr_description_notice"
+              android:layout_width="wrap_content"
+              android:layout_height="36dp"
+              android:layout_above="@+id/btn_usb_linked"
+              android:layout_gravity="center_vertical|center_horizontal|center"
+              android:layout_marginStart="8dp"
+              android:layout_marginEnd="8dp"
+              android:layout_marginBottom="10dp"
+              android:layout_marginTop="10dp"
+              android:gravity="center"
+              android:src="@drawable/plzcon"
+              android:fontFamily="@font/dangdang"
+              android:text="DSLR 카메라 촬영 모드"
+              android:textStyle="normal"
+              android:textSize="20dp"
+              android:textAlignment="center"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toBottomOf="@+id/dslr_btn_usb_linked" />
+
+          <ImageView
+              android:id="@+id/dslr_btn_usb_linked"
+              android:layout_width="110dp"
+              android:layout_height="110dp"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentBottom="true"
+              android:layout_centerHorizontal="true"
+              android:layout_gravity="center"
+              android:layout_marginLeft="133dp"
+              android:layout_marginRight="100dp"
+              android:layout_marginBottom="230dp"
+              android:src="@drawable/conn_before"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintHorizontal_bias="0.375"
+              app:layout_constraintStart_toStartOf="parent" />
+
+          <ImageButton
+              android:id="@+id/btn_cloud"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="0dp"
+              android:layout_marginBottom="0dp"
+              android:src="@drawable/cloud_check_copy"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintEnd_toEndOf="parent" />
+          <ImageButton
+              android:id="@+id/btn_sdcard"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="0dp"
+              android:layout_marginBottom="0dp"
+              android:src="@drawable/sd_card_check_copy"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintStart_toStartOf="parent" />
+
+          <ImageView
+              android:id="@+id/dslr_read_Image"
+              android:layout_width="00dp"
+              android:layout_height="400dp"
+              android:layout_marginStart="8dp"
+              android:layout_marginEnd="8dp"
+              android:visibility="gone"
+              app:layout_constraintBottom_toBottomOf="@+id/frameLayout3"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent" />
+
+          <FrameLayout
+              android:id="@+id/frameLayout3"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              tools:ignore="MissingConstraints"
+              tools:layout_editor_absoluteX="0dp"
+              tools:layout_editor_absoluteY="0dp">
+
+              <ImageButton
+                  android:id="@+id/btn_search_patient_dslr"
+                  android:layout_width="wrap_content"
+                  android:layout_height="80dp"
+                  android:layout_margin="5sp"
+                  android:layout_marginTop="50dp"
+                  android:paddingRight="300dp"
+                  android:background="@color/lightgrey"
+                  android:src="@drawable/human2"
+                  app:layout_constraintEnd_toEndOf="parent" />
+
+              <TextView
+                  android:id="@+id/patient_name_dslr"
+                  android:layout_width="300dp"
+                  android:layout_height="48dp"
+                  android:layout_marginLeft="80dp"
+                  android:layout_marginTop="30dp"
+                  android:layout_marginEnd="5dp"
+                  android:layout_marginRight="50dp"
+                  android:fontFamily="@font/danjung"
+                  android:text="환자명"
+                  android:gravity="left"
+                  android:textColor="@color/black"
+                  android:autoSizeTextType="uniform"
+                  app:layout_constraintBottom_toTopOf="@+id/btn_search_patient_dslr"
+                  app:layout_constraintEnd_toEndOf="parent" />
+
+              <ImageButton
+                  android:adjustViewBounds="true"
+                  android:scaleType="fitCenter"
+                  android:id="@+id/btn_search_doctor_dslr"
+                  android:layout_width="wrap_content"
+                  android:layout_height="65dp"
+                  android:layout_marginTop="108dp"
+                  android:paddingRight="180dp"
+                  android:layout_marginBottom="2dp"
+                  android:background="@null"
+                  android:src="@drawable/btn_doctor4" />
+
+              <TextView
+                  android:id="@+id/doctor_name_dslr"
+                  android:layout_width="255dp"
+                  android:layout_height="48dp"
+                  android:layout_marginLeft="80dp"
+                  android:layout_marginTop="118dp"
+                  android:layout_marginRight="150dp"
+                  android:layout_marginBottom="6dp"
+                  android:layout_toLeftOf="@id/btn_search_doctor_dslr"
+                  android:autoSizeTextType="uniform"
+                  android:fontFamily="@font/dangdang"
+                  android:gravity="left"
+                  android:text="의사명"
+                  android:textColor="@color/black" />
+
+          </FrameLayout>
+
+          <RelativeLayout
+              android:id="@+id/dslr_photo_container"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentEnd="true"
+              android:layout_alignParentRight="true"
+              android:paddingTop="10dp"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent">
+
+          </RelativeLayout>
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </FrameLayout>
+
+</LinearLayout>

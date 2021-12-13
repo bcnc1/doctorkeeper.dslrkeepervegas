@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/login_back"
+    android:fitsSystemWindows="true">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="130dp"
+                android:layout_gravity="center"
+                android:background="@drawable/login_logo" />
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="스마트파이"-->
+<!--                android:textColor="@color/bccolor"-->
+<!--                android:textSize="24sp"-->
+<!--                android:layout_marginLeft="10dp"/>-->
+        </LinearLayout>
+        <LinearLayout
+            android:background="#d8d8d8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/input_email"
+                android:background="@android:color/transparent"
+                android:textStyle="bold"
+                android:textSize="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/black"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:hint="ID" />
+        </LinearLayout>
+
+        <!--  Password Label -->
+        <LinearLayout
+            android:background="#d8d8d8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/input_password"
+                android:background="@android:color/transparent"
+                android:textStyle="bold"
+                android:textSize="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:textColor="@color/black"
+                android:inputType="textPassword"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:hint="PW"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <Button
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/btn_login"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="@drawable/login_go"
+                />
+
+        </LinearLayout>
+
+
+        <!--<TextView android:id="@+id/link_signup"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="24dp"-->
+        <!--android:text="가입 "-->
+        <!--android:gravity="center"-->
+        <!--android:textSize="16dip"/>-->
+
+    </LinearLayout>
+
+</ScrollView>

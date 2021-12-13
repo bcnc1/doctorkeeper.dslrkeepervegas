@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/alert_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/sdcard_alert_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="40dp"
+        android:fontFamily="@font/danjung"
+
+        android:text="3개 이미지 선택" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/sdcard_alert_select"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:fontFamily="@font/danjung"
+            android:textColor="#5cb533"
+            android:stateListAnimator="@null"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="계속 선택" />
+
+        <Button
+            android:id="@+id/sdcard_alert_upload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:fontFamily="@font/danjung"
+            android:textColor="#5cb533"
+            android:text="업로드" />
+    </LinearLayout>
+
+</LinearLayout>

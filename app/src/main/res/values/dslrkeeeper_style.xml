@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/dangdang</item>
+        <item name="android:gravity">center</item>
+<!--        <item name = "android:textColor">#5cb533</item>-->
+    </style>
+</resources>
