@@ -49,7 +49,12 @@ import java.util.UUID;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.doctorkeeper.dslrkeeper2022.MainActivity.countDownTimer;
+import static com.loopj.android.http.AsyncHttpClient.log;
+
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
+import com.loopj.android.http.RequestParams;
+
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class MadamfiveAPI {
 
@@ -86,6 +91,10 @@ public class MadamfiveAPI {
         return Constants.m5.BASE_URL + "/v1/" + relativeUrl;
     }
 
+    private static String getAbsoluteUrl2(String relativeUrl) {
+        return Constants.bcnc.BASE_URL + "/api/v1" + relativeUrl;
+    }
+
     public static Activity getActivity() {
         return mActivity;
     }
@@ -99,7 +108,61 @@ public class MadamfiveAPI {
         mContext = context;
     }
 
+    public static void loginDoctorKeeper(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", username);
+        params.put("pwd", password);
+        JsonObjectRequest request = new JsonObjectRequest(getAbsoluteUrl2("/user/login"), new JSONObject(params),
+                response -> {
+                    Log.i(TAG, "response : " + response);
+                    try {
+                        if (response.has("token") == true) {
+                            mAcccessToken = URLDecoder.decode(response.getString("token"));
+                            SmartFiPreference.setDoctorId(getActivity(),username);
+                            SmartFiPreference.setSfDoctorPw(getActivity(),password);
+                            SmartFiPreference.setHospitalId(getActivity(),username);
+                            SmartFiPreference.setSfToken(getActivity(),mAcccessToken);
+                            Log.i(TAG, "mAcccessToken : " + mAcccessToken);
+                            responseHandler.onSuccess(200, null, response.toString());
+//                                JSONArray boards = response.getJSONArray("boards");
+//                                for(int i=0;i<boards.length();i++){
+//                                    JSONObject board = boards.getJSONObject(i);
+//                                    if(board.get("type").toString().equals("hospital")){
+//                                        boardId = board.get("id").toString();
+//
+////                                        Log.i(TAG,"Board Id : =========" + boardId);
+//                                        break;
+//                                    }
+//                                }
+                        }else{
+                            responseHandler.onSuccess(400, null, response.toString());
+                        }
+//                        Log.i(TAG, "Response:%n %s" + response.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "Error: " + error.getMessage());
+                responseHandler.onFailure(0, null, error.getLocalizedMessage(), null);
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("X-Madamfive-APIKey", mAPIKey);
+                return params;
+            }
+        };
+
+        request.setRetryPolicy(new DefaultRetryPolicy(10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+
+    }
 
     public static void login(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
@@ -267,7 +330,7 @@ public class MadamfiveAPI {
         } catch (JSONException e) {
             Log.i("m5API",e.toString());
         }
-        Log.i(TAG,"Start Upload ====>>> "+getAbsoluteUrl("boards/" + boardId+"/posts"));
+        Log.i(TAG,"Start Upload ====>>> "+getAbsoluteUrl2("boards/" + boardId+"/posts"));
         VolleyMultipartRequest request = new VolleyMultipartRequest(Request.Method.POST, getAbsoluteUrl("boards/" + boardId+"/posts"),
                 new Response.Listener<NetworkResponse>() {
                     @Override
@@ -427,6 +490,26 @@ public class MadamfiveAPI {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(mContext).addToRequestQueue(request);
 
+    }
+
+    public static void getPatientList(String name, String chartNo, JsonHttpResponseHandler handler){
+        String url = Constants.bcnc.BASE_URL + "/api/v1/patient/search?";
+        StringEntity jsonEntity = null;
+        String hospitalId = SmartFiPreference.getHospitalId(getContext());
+        String token = SmartFiPreference.getSfToken(getContext());
+
+        RequestParams params = new RequestParams();
+        params.put("id", hospitalId);
+        if(!name.isEmpty()) {
+            params.put("name", name);
+        }
+        if(!chartNo.isEmpty()) {
+            params.put("chno", chartNo);
+        }
+
+        log.w(TAG,params.toString());
+        client.addHeader("X-Auth-Token", token);
+        client.get(getContext(), url, params,handler);
     }
 
     public static void searchPatient (String searchName,String searchChart, final JsonHttpResponseHandler responseHandler){

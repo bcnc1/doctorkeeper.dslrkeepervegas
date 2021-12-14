@@ -9,14 +9,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Messenger;
 import android.os.Parcelable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
+import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
@@ -25,12 +29,16 @@ import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -63,22 +71,22 @@ public class PictureIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startUploadPicture(Context context, long id) {
+    public static void startUploadPicture(Context context, String Path) {
         mCon = context;
         Intent intent = new Intent(context, PictureIntentService.class);
-        intent.putExtra(EXTRA_PICTURE_ID, id);
+        intent.putExtra(EXTRA_PICTURE_ID, Path);
         mCon.startService(intent);
         Log.w(TAG,"startUploadPicture 호출");
     }
 
-    public static void startUploadPicture(Context context, long id, Parcelable value) {
-        mCon = context;
-        Intent intent = new Intent(context, PictureIntentService.class);
-        intent.putExtra(EXTRA_PICTURE_ID, id);
-        intent.putExtra(Constants.MESSENGER, value);
-        mCon.startService(intent);
-        Log.w(TAG,"startUploadPicture 호출");
-    }
+//    public static void startUploadPicture(Context context, long id, Parcelable value) {
+//        mCon = context;
+//        Intent intent = new Intent(context, PictureIntentService.class);
+//        intent.putExtra(EXTRA_PICTURE_ID, id);
+//        intent.putExtra(Constants.MESSENGER, value);
+//        mCon.startService(intent);
+//        Log.w(TAG,"startUploadPicture 호출");
+//    }
 
 
     @Override
@@ -93,12 +101,12 @@ public class PictureIntentService extends IntentService {
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if(extras != null){
-                long id = extras.getLong(EXTRA_PICTURE_ID);
+                String Path = extras.getString(EXTRA_PICTURE_ID);
                 mMessenger = (Messenger) extras.get(Constants.MESSENGER);
-                Log.d(TAG,"id = "+id);
-                PhotoModel photoModel = PhotoModelService.getPhotoModel(id);
-                mPatientId = photoModel.getCustNo();
-                uploadPicture(photoModel);
+                Log.d(TAG,"Path = "+Path);
+//                PhotoModel photoModel = PhotoModelService.getPhotoModel(id);
+//                mPatientId = photoModel.getCustNo();
+                uploadPicture(Path);
 
             }
 
@@ -113,23 +121,15 @@ public class PictureIntentService extends IntentService {
 
     }
 
-    private void uploadPicture(final PhotoModel pm) {
-        final String filePath = pm.getFullpath();
-        final Long photoModelId = pm.getId();
+    private void uploadPicture(final String path) {
 
-        if(pm.getMode() == 0 || pm.getMode() == 1){
-            mMediaType = "pictures";
-        }else if(pm.getMode() == 2){
-            mMediaType = "videos";
-        }
+        mMediaType = "pictures";
 
         Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
 
-                pm.setThumbUploading(1);
-
-                File file  = new File(filePath);
+                File file  = new File(path);
                 byte[] bytes = null;
                 try{
                     FileInputStream fis = new FileInputStream(file);
@@ -145,29 +145,48 @@ public class PictureIntentService extends IntentService {
                     Log.i(TAG,e.toString());
                 }
                 Log.i(TAG,"uploadImage => Read Bitmap");
-                String cameraKind="";
-                if(pm.getMode() == 0 ){
-                    cameraKind = "Phone";
-                }else if(pm.getMode() == 1){
-                    cameraKind = "DSLR";
-                }
 
-                MadamfiveAPI.createPost(bytes, cameraKind, photoModelId, new JsonHttpResponseHandler() {
+                BlabAPI.uploadImage(path, bytes, new JsonHttpResponseHandler(){
                     @Override
                     public void onStart() {
-                        Log.i("AsyncTask", "Uploading");
+                        Log.i(TAG, "Uploading");
                     }
                     @Override
-                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
-                        Log.d("AsyncTask", "HTTP21:" + statusCode + responseString);
-//                        Toast.makeText(getActivity(),"이미지 저장 완료!",Toast.LENGTH_SHORT).show();
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        Log.d(TAG, "Success1:" + statusCode + response);
+                        Toast.makeText(BlabAPI.getActivity(),"이미지 저장 완료!",Toast.LENGTH_SHORT).show();
+                        deleteFiles();
                     }
                     @Override
-                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                        Log.d("AsyncTask", "HTTP22:" + statusCode + response.toString());
-//                        Toast.makeText(getActivity(),"이미지 저장 완료!",Toast.LENGTH_SHORT).show();
+                    public void onSuccess(int statusCode, Header[] headers, String response) {
+                        super.onSuccess(statusCode, headers, response);
+                        Log.d(TAG, "Success2:" + statusCode);
+                        Handler handler = new Handler(Looper.getMainLooper());
+
+                        if (statusCode==201) {
+                            handler.postDelayed(() -> {
+                                Toast toast = Toast.makeText(mCon, "업로드 성공", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                            }, 0);
+                        } else {
+                            handler.postDelayed(() -> {
+                                Toast toast = Toast.makeText(mCon, "업로드 실패", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                            }, 0);
+                        }
+
+                        deleteFiles();
+                    }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        Log.d(TAG, "Failure:" + statusCode + responseString);
                     }
                 });
+
                 Log.i(TAG,"uploadImage => Finished");
 
             }
@@ -175,6 +194,32 @@ public class PictureIntentService extends IntentService {
 
         t1.start();
     }
+
+
+
+    private void deleteFiles(){
+        Log.i(TAG,"Delete Files Started");
+
+        File directory = new File(MadamfiveAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())+File.separator);
+        File[] files = directory.listFiles();
+        Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
+        Log.d(TAG, "Delete Size: "+ files.length);
+        if(files.length > 50){
+            for (int i = 50; i < files.length; i++)
+            {
+                Log.d(TAG, "Delete FileName:" + files[i].getAbsolutePath());
+                File file1 = files[i];
+                if(file1.isFile()){
+                    File thumbnail = new File(files[i].getAbsolutePath().replace("/mounted/","/mounted/thumbnail/"));
+                    file1.delete();
+                    thumbnail.delete();
+                }
+//                file1.delete();
+            }
+        }
+
+    }
+
 
     private void makeNoti(final String message, int id) {
 

@@ -1,6 +1,8 @@
 package com.doctorkeeper.dslrkeeper2022.view.patient;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,7 @@ public class PatientDialogAdapter extends BaseAdapter {
         return i;
     }
 
+    @SuppressLint("ViewHolder")
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
 
@@ -60,8 +63,8 @@ public class PatientDialogAdapter extends BaseAdapter {
         patient_chartNumber = (TextView) view.findViewById(R.id.patient_chartNumber);
 
         patientSearchDisplayExtraOption = SmartFiPreference.getSfDisplayExtraOpt(MadamfiveAPI.getActivity());
+        HashMap<String, String> patientInfo = getItem(i);
         if(patientSearchDisplayExtraOption){
-            HashMap<String, String> patientInfo = getItem(i);
             patient_name.setText(patientInfo.get("name"));
             if(patientInfo.get("birthDate") == null){
                 patient_chartNumber.setText("");
@@ -69,16 +72,16 @@ public class PatientDialogAdapter extends BaseAdapter {
                 patient_chartNumber.setText(patientInfo.get("birthDate"));
             }
         }else {
-            HashMap<String, String> patientInfo = getItem(i);
             String name = patientInfo.get("name");
-            if(name.equals("null")){
+            Log.i("TAG", "name : " + name);
+            if(name==null){
                 name = "";
             }
             patient_name.setText(name);
 
-            String chartNumber = patientInfo.get("chartNumber");
-
-            if(chartNumber.equals("null")){
+            String chartNumber = patientInfo.get("chrtNo");
+            Log.i("TAG", "chartNumber : " + chartNumber);
+            if(chartNumber==null){
                 chartNumber = "";
             }
 

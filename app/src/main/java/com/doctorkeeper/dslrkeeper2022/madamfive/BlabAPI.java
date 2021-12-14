@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.view.Gravity;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ import okhttp3.RequestBody;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.doctorkeeper.dslrkeeper2022.MainActivity.countDownTimer;
+import static com.loopj.android.http.AsyncHttpClient.log;
 
 
 public class BlabAPI {
@@ -127,6 +129,69 @@ public class BlabAPI {
     private static String getAbsoluteUrl(String relativeUrl) {
         return Constants.Storage.BASE_URL + "/" + relativeUrl;
     }
+
+    public static void uploadImage(final String path, byte[] image, JsonHttpResponseHandler handler){
+        String url = Constants.Storage.BASE_URL;
+//        String url = "http://ssproxy.ucloudbiz.olleh.com/v1/AUTH_8c4583d1-b030-4cc2-8e65-7e747563dbeb/";
+        String doctorId = SmartFiPreference.getDoctorId(MadamfiveAPI.getActivity());
+//        String doctorId = "bcnc01";
+        String[] files = path.split("/");
+        String fileName = files[files.length-1];
+        final String urlTarget = url + "/" + doctorId + "/" + fileName;
+        String token = SmartFiPreference.getSfToken(MadamfiveAPI.getActivity());
+//        String token = "123";
+        log.i(TAG,"url:::"+url);
+        log.i(TAG,"doctorId:::"+doctorId+"token:::"+token);
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.i(TAG,"path:::"+path);
+
+                File f = new File(path);
+                log.i(TAG,"f:::"+f);
+                String content_type = getMimeType(path);
+                OkHttpClient client = new OkHttpClient();
+                RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
+
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url(urlTarget)
+                        .put(file_body)
+                        .addHeader("X-Auth-Token", token)
+                        .build();
+
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+                    log.w(TAG, response.toString());
+                    //response.body()
+
+                    if (!response.isSuccessful()) {
+                        // throw new IOException("Error : "+response);
+                        handler.onFailure(response.code(), null, response.toString(), null);
+                    } else {
+                        handler.onSuccess(response.code(), null, "");
+                        log.i(TAG,"response.code():::"+response.code());
+
+                        if (response.code()==201) {
+                            log.i(TAG,"Image upload success");
+//                            Toast.makeText(con, con.getString(R.string.check_network), Toast.LENGTH_SHORT);
+                        } else {
+                            log.i(TAG,"Image upload failed");
+                        }
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    log.w(TAG, e.toString());
+                }
+            }
+        });
+        t.start();
+
+    }
+
+
+
 
     public static void loginEMR(Context con, String id, String pw){
         String url = Constants.EMRAPI.BASE_URL +Constants.EMRAPI.LOGIN;

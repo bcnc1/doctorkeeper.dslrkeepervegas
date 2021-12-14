@@ -679,10 +679,10 @@ public class GalleryFragment extends SessionFragment
                 getActivity().getExternalFilesDir(Environment.getExternalStorageState()),mFileName, currentBitmap, thumb);
 
         if(path != null){
-            PhotoModel photoModel = PhotoModelService.addPhotoModelWithRawName(getActivity(), mFile.toString(),path, mFileName, currentObjectInfo, 1);
-            Long id = photoModel.getId();
+//            PhotoModel photoModel = PhotoModelService.addPhotoModelWithRawName(getActivity(), mFile.toString(),path, mFileName, currentObjectInfo, 1);
+//            Long id = photoModel.getId();
             Messenger messenger = new Messenger(msgHandler);
-            PictureIntentService.startUploadPicture(getActivity(), id, messenger);
+            PictureIntentService.startUploadPicture(getActivity(), path);
             numberOfUploaded++;
             multi_image_uploading_progressbar.setProgress(numberOfUploaded);
 

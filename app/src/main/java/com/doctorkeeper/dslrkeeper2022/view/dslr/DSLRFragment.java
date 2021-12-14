@@ -57,6 +57,8 @@ import com.doctorkeeper.dslrkeeper2022.view.sdcard.SDCardFragment;
 import com.doctorkeeper.dslrkeeper2022.view.sdcard.StorageAdapter;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -420,7 +422,11 @@ public class DSLRFragment extends SessionFragment implements
                     if(readImage.isEnabled())  readImage.setVisibility(View.GONE);
                     upload_Notice.setVisibility(View.VISIBLE);
 
-                    sendPhoto(currentObjectHandle, objectInfo, thumbnail, currentBitmap);
+                    try {
+                        sendPhoto(currentObjectHandle, objectInfo, thumbnail, currentBitmap);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                     displayPhoto(objectHandle,currentBitmap);
 
                 }
@@ -478,11 +484,15 @@ public class DSLRFragment extends SessionFragment implements
 
     }
 
-    private void sendPhoto(int objectHandle, ObjectInfo info, Bitmap thumb, Bitmap bitmap) {
+    private void sendPhoto(int objectHandle, ObjectInfo info, Bitmap thumb, Bitmap bitmap) throws UnsupportedEncodingException {
 //        Log.d(TAG, "sendPhoto");
         currentObjectHandle = 0;
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
-        mFileName = DEVICE + "_" + timeStamp+".jpg";
+        String PatientName = SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity());
+        String PatientChart = SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity());
+        mFileName = URLEncoder.encode(PatientName+"_"+PatientChart+"_"+timeStamp+".jpg", "UTF-8");
+        Log.i(TAG, "mFileName:" + mFileName);
+
 
         mFile = new File(getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
 
@@ -493,7 +503,7 @@ public class DSLRFragment extends SessionFragment implements
         if(path != null){
             PhotoModel photoModel = PhotoModelService.addPhotoModel(getActivity(), mFile.toString(),path, mFileName, 1);
             Long id = photoModel.getId();
-            PictureIntentService.startUploadPicture(getActivity(), id);
+            PictureIntentService.startUploadPicture(getActivity(), path);
         }else{
             Toast.makeText(getActivity(), R.string.make_error_thumbnail, Toast.LENGTH_SHORT);
         }

@@ -14,6 +14,10 @@ public class Constants {
         public static final String BASE_URL = "http://api.doctorkeeper.com:7818";
     }
 
+    public static final class bcnc{
+        public static final String BASE_URL = "http://211.252.85.83:3100";
+    }
+
     public static final class Upload{
         public static final String FILE_UPLOAD_SUCCESS = "file.upload.success";
         public static final String FILE_UPLOAD_FAIL = "file.upload.fail";
@@ -25,7 +29,9 @@ public class Constants {
     }
 
     public static final class Storage{
-        public static final String BASE_URL = "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_3de4a999-ff5c-416a-ad30-77fcd4f9383f";
+//        public static final String BASE_URL = "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_3de4a999-ff5c-416a-ad30-77fcd4f9383f";
+          public static final String BASE_URL = "http://ssproxy.ucloudbiz.olleh.com/v1/AUTH_8c4583d1-b030-4cc2-8e65-7e747563dbeb";
+
     }
 
     public static final class Chain{

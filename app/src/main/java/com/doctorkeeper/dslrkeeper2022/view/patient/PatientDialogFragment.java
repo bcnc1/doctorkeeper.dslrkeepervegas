@@ -28,10 +28,13 @@ import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import cz.msebera.android.httpclient.Header;
 
 
 public class PatientDialogFragment extends DialogFragment {
@@ -111,7 +114,7 @@ public class PatientDialogFragment extends DialogFragment {
                     chartNumberTextView.clearFocus();
                     final String loginCheck = keyword;
 
-                    searchPatient(name, chartNumber);
+                    searchPatientOpt(name, chartNumber);
                 }else {
                     Toast.makeText(MadamfiveAPI.getActivity(), getString(R.string.check_network), Toast.LENGTH_SHORT).show();
                 }
@@ -126,12 +129,13 @@ public class PatientDialogFragment extends DialogFragment {
                 HashMap<String, String> patientInfo = (HashMap<String, String>) adapterView.getItemAtPosition(i);
                 String name = patientInfo.get("name");
                 Toast.makeText(getActivity(), name + "님이 선택되었습니다", Toast.LENGTH_LONG).show();
-
-                SmartFiPreference.setPatientId(getActivity(), patientInfo.get("categoryId"));
-                SmartFiPreference.setSfPatientCustNo(getActivity(),patientInfo.get("custNo"));
+//
+//                SmartFiPreference.setPatientId(getActivity(), patientInfo.get("categoryId"));
+//                SmartFiPreference.setSfPatientCustNo(getActivity(),patientInfo.get("custNo"));
                 SmartFiPreference.setSfPatientName(getActivity(), name);
-                SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chartNumber"));
-
+                SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chrtNo"));
+                Log.i(TAG, "getSfPatientName: " + SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
+                Log.i(TAG, "getPatientChart: " + SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity()));
 //                SmartFiPreference.setSfPatientCustNo(getActivity(), patientInfo.get("custNo"));
 //                SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chartNumber"));
 //                SmartFiPreference.setSfPatientName(getActivity(),name);
@@ -148,12 +152,70 @@ public class PatientDialogFragment extends DialogFragment {
         return view;
     }
 
+    private void searchPatientOpt(final String searchName, final String searchChart) {
+
+        ArrayList<HashMap<String, String>> patientInfoList = new ArrayList<HashMap<String, String>>();
+
+        if (searchChart == null || searchChart.length() == 0 && searchName == null || searchName.length() == 0) {
+            Toast.makeText(getActivity(), "이름 또는 차트번호를 입력해 주세요", Toast.LENGTH_SHORT).show();
+            patient_list_progressBar.setVisibility(View.INVISIBLE);
+            return;
+
+        }
+
+        MadamfiveAPI.getPatientList(searchName, searchChart, new JsonHttpResponseHandler(){
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                super.onSuccess(statusCode, headers, response);
+
+                Log.i(TAG, "statusCode: " + statusCode);
+                Log.i(TAG, "response.length(): " + response.length());
+                Log.i(TAG, "patientInsertExtraOption:  " + patientInsertExtraOption);
+                if (patientInsertExtraOption && response.length() == 0) {
+                    addPatientInfo(searchName, searchChart);
+                    patient_list_progressBar.setVisibility(View.INVISIBLE);
+//                    Toast toast = Toast.makeText(getActivity(), "해당 환자가 없습니다", Toast.LENGTH_LONG);
+//                    toast.setGravity(Gravity.CENTER, 0, 0);
+//                    toast.show();
+                }
+
+                patient_list_progressBar.setVisibility(View.INVISIBLE);
+                for(int i=0;i<response.length();i++){
+                    HashMap<String,String> h = new HashMap<>();
+                    try {
+                        JSONObject j = response.getJSONObject(i);
+                        h.put("name", j.getString("name").trim());
+                        h.put("chrtNo", j.getString("chrtNo").trim());
+                        patientInfoList.add(h);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                adapter.setItems(patientInfoList);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.v(TAG,responseString);
+                patient_list_progressBar.setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "no Patient", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
+
+    }
+
     private void searchPatient(final String searchName, final String searchChart) {
 
         MadamfiveAPI.searchPatient(searchName, searchChart, new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
-                Log.i(TAG, "onStart:");
+                Log.i(TAG, "searchPatient onStart:");
             }
 
             @Override

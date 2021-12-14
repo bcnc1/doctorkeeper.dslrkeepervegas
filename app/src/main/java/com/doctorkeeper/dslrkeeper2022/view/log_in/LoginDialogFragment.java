@@ -38,6 +38,8 @@ import com.doctorkeeper.dslrkeeper2022.view.patient.PatientDialogFragment;
 
 import org.json.JSONObject;
 
+import cz.msebera.android.httpclient.Header;
+
 public class LoginDialogFragment extends DialogFragment {
 
     private final String TAG = LoginDialogFragment.class.getSimpleName();
@@ -70,7 +72,7 @@ public class LoginDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 loginButton.setEnabled(false);
-                MadamfiveAPI.login(usernameTextView.getText().toString(), passwordTextView.getText().toString(), new JsonHttpResponseHandler() {
+                MadamfiveAPI.loginDoctorKeeper(usernameTextView.getText().toString(), passwordTextView.getText().toString(), new JsonHttpResponseHandler() {
                     @Override
                     public void onStart() {
                         Log.i(TAG, "onStart:");
@@ -78,7 +80,7 @@ public class LoginDialogFragment extends DialogFragment {
                     @Override
                     public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
                         Log.i(TAG, "HTTPa:" + statusCode + responseString);
-                        if(statusCode == 400) {
+                        if(statusCode == 400 || statusCode == 401 || statusCode == 204 || statusCode == 403) {
                             Toast toast = Toast.makeText(getActivity(), "아이디 또는 비밀번호를 확인해 주세요", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
@@ -107,6 +109,13 @@ public class LoginDialogFragment extends DialogFragment {
                         Log.i(TAG, "HTTPb:" + statusCode + response.toString());
                         dismiss();
                         startSelectPatient();
+                    }
+                    @Override
+                    public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        Log.w(TAG,"failed statusCode : " + statusCode);
+                        Log.w(TAG,"failed headers : " + headers);
+                        Log.w(TAG,"failed responseString : " + responseString);
                     }
                 });
             }
