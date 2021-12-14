@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId 'com.doctorkeeper.dslrkeeper2022'
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
     }
     buildTypes {
         release {
