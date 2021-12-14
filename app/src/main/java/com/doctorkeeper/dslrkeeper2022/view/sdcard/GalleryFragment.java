@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doctorkeeper.dslrkeeper2022.R;
+import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.PtpConstants;
@@ -51,12 +52,15 @@ import com.doctorkeeper.dslrkeeper2022.ptp.model.ObjectInfo;
 import com.doctorkeeper.dslrkeeper2022.services.PhotoModelService;
 import com.doctorkeeper.dslrkeeper2022.services.PictureIntentService;
 import com.doctorkeeper.dslrkeeper2022.util.DisplayUtil;
+import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.SessionActivity;
 import com.doctorkeeper.dslrkeeper2022.view.SessionFragment;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.doctorkeeper.dslrkeeper2022.view.sdcard.GalleryAdapter.ViewHolder;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -673,7 +677,25 @@ public class GalleryFragment extends SessionFragment
         //삭제 예정
        //sendPhoto(currentObjectInfo, currentBitmap);
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
-        mFileName = DEVICE + "_" + timeStamp+".jpg";
+        String HospitalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
+        String PatientName = SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity());
+        String PatientChart = SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity());
+        String DoctorName = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
+        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+
+        if (DSLRFragment.doctorSelectExtraOption && DoctorName != null && DoctorName.length() != 0) {
+            try {
+                mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+DoctorName+"_"+DoctorNumber+"_"+timeStamp+".jpg", "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+timeStamp+".jpg", "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         mFile = new File(getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
         String path = DisplayUtil.storeDslrImage(mFile.toString(),
                 getActivity().getExternalFilesDir(Environment.getExternalStorageState()),mFileName, currentBitmap, thumb);

@@ -164,6 +164,53 @@ public class MadamfiveAPI {
 
     }
 
+    public static void getDoctorList(String name, String dno, JsonHttpResponseHandler handler){
+        log.i(TAG,"getDoctorList");
+        String url = Constants.bcnc.BASE_URL + "/api/v1/doctor/search?";
+        StringEntity jsonEntity = null;
+        String hospitalId = SmartFiPreference.getHospitalId(getContext());
+        String token = SmartFiPreference.getSfToken(getContext());
+
+        RequestParams params = new RequestParams();
+        params.put("id", hospitalId);
+        if(!name.isEmpty()) {
+            params.put("name", name);
+        }
+        if(!dno.isEmpty()) {
+            params.put("dno", dno);
+        }
+
+        log.w(TAG,params.toString());
+        client.addHeader("X-Auth-Token", token);
+        client.get(getActivity(), url, params,handler);
+    }
+
+    public static void insertDoctor(Context con, String name, String dno, JsonHttpResponseHandler responseHandler){
+        log.i(TAG, "insertDoctor:::" + name + ":::" + dno);
+        String hospitalId = SmartFiPreference.getHospitalId(getContext());
+        String token = SmartFiPreference.getSfToken(getContext());
+        String url = Constants.bcnc.BASE_URL + "/api/v1/doctor/create";
+        StringEntity jsonEntityUTF8;
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("id", hospitalId);
+            jsonParams.put("name", name);
+            jsonParams.put("dno", dno);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            log.w(TAG,e+"");
+        }
+        jsonEntityUTF8 = new StringEntity(jsonParams.toString(), org.apache.http.protocol.HTTP.UTF_8);
+
+        client.addHeader("Accept", "application/json");
+        client.addHeader("Content-Type", "application/json");
+        client.addHeader("X-Auth-Token", token);
+        client.post(con, url, jsonEntityUTF8, "application/json",responseHandler);
+
+    }
+
+
+
     public static void login(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
         HashMap<String, String> params = new HashMap<String, String>();
@@ -609,56 +656,80 @@ public class MadamfiveAPI {
 
     }
 
-    public static void insertPatient (String name, String chartNumber, final JsonHttpResponseHandler responseHandler){
+    public static void insertPatient(Context con, String name, String chno, JsonHttpResponseHandler responseHandler){
+        log.i(TAG, "insertPatient:::" + name + ":::" + chno);
+        String hospitalId = SmartFiPreference.getHospitalId(getContext());
+        String token = SmartFiPreference.getSfToken(getContext());
+        String url = Constants.bcnc.BASE_URL + "/api/v1/patient/create";
+        StringEntity jsonEntityUTF8;
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("id", hospitalId);
+            jsonParams.put("name", name);
+            jsonParams.put("chno", chno);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            log.w(TAG,e+"");
+        }
+        jsonEntityUTF8 = new StringEntity(jsonParams.toString(), org.apache.http.protocol.HTTP.UTF_8);
 
-        mAcccessToken = getAccessToken();
-        boardId = getBoardId();
-
-        String queryString = "?name="+URLEncoder.encode(name)+"&code="+URLEncoder.encode(chartNumber);
-        queryString = queryString+"&parentId="+URLEncoder.encode(chartNumber)+"&description=";
-        queryString = queryString+"&checkParentId=true"+"&type=patient&published=true";
-        queryString = queryString+"&accessToken="+URLEncoder.encode(mAcccessToken);
-
-        String relativeURL = "boards/"+boardId+"/categories"+queryString;
-
-        Log.i("URL=====", getAbsoluteUrl(relativeURL).toString());
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,getAbsoluteUrl(relativeURL), null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            responseHandler.onSuccess(200, null, response.toString());
-                            Log.i(TAG, "Response:%n %s" + response.toString());
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-//                        callBack.onSuccess(imageInfoList);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "Error: " + error.getMessage());
-                responseHandler.onFailure(0, null, error.getLocalizedMessage(), null);
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("X-Madamfive-APIKey", mAPIKey);
-                return params;
-            }
-
-        };
-
-        request.setRetryPolicy(new DefaultRetryPolicy(10000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+        client.addHeader("Accept", "application/json");
+        client.addHeader("Content-Type", "application/json");
+        client.addHeader("X-Auth-Token", token);
+        client.post(con, url, jsonEntityUTF8, "application/json",responseHandler);
 
     }
+
+//    public static void insertPatient (String name, String chartNumber, final JsonHttpResponseHandler responseHandler){
+//
+//        mAcccessToken = getAccessToken();
+//        boardId = getBoardId();
+//
+//        String queryString = "?name="+URLEncoder.encode(name)+"&code="+URLEncoder.encode(chartNumber);
+//        queryString = queryString+"&parentId="+URLEncoder.encode(chartNumber)+"&description=";
+//        queryString = queryString+"&checkParentId=true"+"&type=patient&published=true";
+//        queryString = queryString+"&accessToken="+URLEncoder.encode(mAcccessToken);
+//
+//        String relativeURL = "boards/"+boardId+"/categories"+queryString;
+//
+//        Log.i("URL=====", getAbsoluteUrl(relativeURL).toString());
+//
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,getAbsoluteUrl(relativeURL), null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            responseHandler.onSuccess(200, null, response.toString());
+//                            Log.i(TAG, "Response:%n %s" + response.toString());
+//
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//
+////                        callBack.onSuccess(imageInfoList);
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.i(TAG, "Error: " + error.getMessage());
+//                responseHandler.onFailure(0, null, error.getLocalizedMessage(), null);
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("X-Madamfive-APIKey", mAPIKey);
+//                return params;
+//            }
+//
+//        };
+//
+//        request.setRetryPolicy(new DefaultRetryPolicy(10000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+//
+//    }
 
     public static void deleteImage() {
 

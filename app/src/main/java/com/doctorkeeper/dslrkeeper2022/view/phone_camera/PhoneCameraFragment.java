@@ -1,7 +1,9 @@
 package com.doctorkeeper.dslrkeeper2022.view.phone_camera;
 
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.doctorkeeper.dslrkeeper2022.R;
 //import com.doctorkeeper.dslrkeeper.activities.LaunchCameraActivity;
 //import com.doctorkeeper.dslrkeeper.activities.LaunchVrecordActivity;
+import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.services.PhotoModelService;
@@ -153,7 +156,31 @@ public class PhoneCameraFragment extends BaseFragment {
 //            MadamfiveAPI.isCameraOn = true;
 //        }
 //    };
+private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.w(TAG,"usbOnReciever === "+intent);
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        btnDslr.setVisibility(View.VISIBLE);
+                        btnSDCard.setVisibility(View.VISIBLE);
+                        BlabAPI.isCameraOn = true;
+                    }
+                },
+                2000);
+    }
+};
 
+    private final BroadcastReceiver usbOffReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.w(TAG,"usbOffReciever === "+intent);
+            btnDslr.setVisibility(View.INVISIBLE);
+            btnSDCard.setVisibility(View.INVISIBLE);
+            BlabAPI.isCameraOn = false;
+        }
+    };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -196,7 +223,7 @@ public class PhoneCameraFragment extends BaseFragment {
             }
             @Override
             public void onImage(CameraKitImage cameraKitImage) {
-                Log.w(TAG,"onImage");
+                Log.w(TAG,"onImage phone cam");
                 mSound.release();
                 Bitmap picture = cameraKitImage.getBitmap();
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
@@ -245,8 +272,8 @@ public class PhoneCameraFragment extends BaseFragment {
 
         IntentFilter on = new IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         IntentFilter off = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
-//        MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
-//        MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
+        MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
+        MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
 
         // Display Doctor info : OPTION
         doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(MadamfiveAPI.getActivity());

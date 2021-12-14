@@ -73,14 +73,14 @@ public class PatientDialogAdapter extends BaseAdapter {
             }
         }else {
             String name = patientInfo.get("name");
-            Log.i("TAG", "name : " + name);
+//            Log.i("TAG", "name : " + name);
             if(name==null){
                 name = "";
             }
             patient_name.setText(name);
 
             String chartNumber = patientInfo.get("chrtNo");
-            Log.i("TAG", "chartNumber : " + chartNumber);
+//            Log.i("TAG", "chartNumber : " + chartNumber);
             if(chartNumber==null){
                 chartNumber = "";
             }

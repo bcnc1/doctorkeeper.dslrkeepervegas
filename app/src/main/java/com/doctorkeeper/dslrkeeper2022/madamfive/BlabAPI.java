@@ -170,11 +170,10 @@ public class BlabAPI {
                         handler.onFailure(response.code(), null, response.toString(), null);
                     } else {
                         handler.onSuccess(response.code(), null, "");
-                        log.i(TAG,"response.code():::"+response.code());
+                        log.i(TAG,"response.code() : "+response.code());
 
                         if (response.code()==201) {
                             log.i(TAG,"Image upload success");
-//                            Toast.makeText(con, con.getString(R.string.check_network), Toast.LENGTH_SHORT);
                         } else {
                             log.i(TAG,"Image upload failed");
                         }
@@ -189,7 +188,6 @@ public class BlabAPI {
         t.start();
 
     }
-
 
 
 

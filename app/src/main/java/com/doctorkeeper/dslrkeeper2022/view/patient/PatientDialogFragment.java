@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
@@ -175,12 +176,11 @@ public class PatientDialogFragment extends DialogFragment {
                 Log.i(TAG, "patientInsertExtraOption:  " + patientInsertExtraOption);
                 if (patientInsertExtraOption && response.length() == 0) {
                     addPatientInfo(searchName, searchChart);
-                    patient_list_progressBar.setVisibility(View.INVISIBLE);
-//                    Toast toast = Toast.makeText(getActivity(), "해당 환자가 없습니다", Toast.LENGTH_LONG);
-//                    toast.setGravity(Gravity.CENTER, 0, 0);
-//                    toast.show();
+                } else if (!patientInsertExtraOption && response.length() == 0) {
+                    Toast toast = Toast.makeText(getActivity(), "해당 환자가 없습니다", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
-
                 patient_list_progressBar.setVisibility(View.INVISIBLE);
                 for(int i=0;i<response.length();i++){
                     HashMap<String,String> h = new HashMap<>();
@@ -304,31 +304,23 @@ public class PatientDialogFragment extends DialogFragment {
                     return;
                 }
 
-                MadamfiveAPI.insertPatient(name, chartNumber, new JsonHttpResponseHandler() {
+                MadamfiveAPI.insertPatient(BlabAPI.getContext(), name, chartNumber, new JsonHttpResponseHandler() {
                 @Override
                 public void onStart() {
-//                    Log.i(TAG, "onStart:");
+                    Log.i(TAG, " onStart: insertPatient ");
                 }
                 @Override
-                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
-                    Log.i(TAG, "HTTPa:" + statusCode + responseString);
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    // If the response is JSONObject instead of expected JSONArray
+                    Log.i(TAG, "HTTPb:" + statusCode + response.toString());
+                    if (statusCode == 202) {
+                        Toast.makeText(getActivity(), "차트번호 중복", Toast.LENGTH_SHORT).show();
+                    }
                     if (statusCode == 200) {
                         try {
-                            JSONObject response = new JSONObject(responseString);
-                            JSONObject patientObject = response.getJSONObject("category");
-
-//                            HashMap<String, String> patientInfo = new HashMap<>();
-//                            patientInfo.put("name", patientObject.getString("name"));
-//                            patientInfo.put("chartNumber", patientObject.getString("parentId"));
-//                            patientInfo.put("categoryId", patientObject.getString("id"));
-//                            selectedPatientInfo = patientInfo;
-
-                            SmartFiPreference.setPatientId(getActivity(), patientObject.getString("id"));
-                            SmartFiPreference.setSfPatientName(getActivity(), patientObject.getString("name"));
-                            SmartFiPreference.setPatientChart(getActivity(),patientObject.getString("parentId"));
-                            SmartFiPreference.setSfPatientCustNo(getActivity(),patientObject.getString("description"));
-
                             Toast.makeText(getActivity(), name + "님이 선택되었습니다", Toast.LENGTH_SHORT).show();
+                            SmartFiPreference.setSfPatientName(getActivity(), name);
+                            SmartFiPreference.setPatientChart(getActivity(),chartNumber);
                             dismiss();
                             dialog.dismiss();
 
@@ -339,13 +331,6 @@ public class PatientDialogFragment extends DialogFragment {
                         } catch (Exception e) {
                         }
                     }
-                }
-
-                @Override
-                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                    // If the response is JSONObject instead of expected JSONArray
-                    Log.i(TAG, "HTTPb:" + statusCode + response.toString());
-                    dialog.dismiss();
                 }
             });
 

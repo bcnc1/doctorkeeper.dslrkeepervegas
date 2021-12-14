@@ -134,7 +134,7 @@ public class DSLRFragment extends SessionFragment implements
     private final String TAG = DSLRFragment.class.getSimpleName();
 
     private boolean storageRead = false;
-    private Boolean doctorSelectExtraOption;
+    public static Boolean doctorSelectExtraOption;
     private Fragment displayPictureFragment;
     private Fragment galleryFragment;
 
@@ -488,9 +488,18 @@ public class DSLRFragment extends SessionFragment implements
 //        Log.d(TAG, "sendPhoto");
         currentObjectHandle = 0;
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
+        String HospitalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
         String PatientName = SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity());
         String PatientChart = SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity());
-        mFileName = URLEncoder.encode(PatientName+"_"+PatientChart+"_"+timeStamp+".jpg", "UTF-8");
+        String DoctorName = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
+        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+
+        if (doctorSelectExtraOption && DoctorName != null && DoctorName.length() != 0) {
+            mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+DoctorName+"_"+DoctorNumber+"_"+timeStamp+".jpg", "UTF-8");
+        } else {
+            mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+timeStamp+".jpg", "UTF-8");
+        }
+
         Log.i(TAG, "mFileName:" + mFileName);
 
 
