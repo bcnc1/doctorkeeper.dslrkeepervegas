@@ -130,12 +130,12 @@ public class BlabAPI {
         return Constants.Storage.BASE_URL + "/" + relativeUrl;
     }
 
-    public static void uploadImage(final String path, byte[] image, JsonHttpResponseHandler handler){
+    public static void uploadImage(final String thumbPath, byte[] image, JsonHttpResponseHandler handler){
         String url = Constants.Storage.BASE_URL;
 //        String url = "http://ssproxy.ucloudbiz.olleh.com/v1/AUTH_8c4583d1-b030-4cc2-8e65-7e747563dbeb/";
         String doctorId = SmartFiPreference.getDoctorId(MadamfiveAPI.getActivity());
 //        String doctorId = "bcnc01";
-        String[] files = path.split("/");
+        String[] files = thumbPath.split("/");
         String fileName = files[files.length-1];
         final String urlTarget = url + "/" + doctorId + "/" + fileName;
         String token = SmartFiPreference.getSfToken(MadamfiveAPI.getActivity());
@@ -146,11 +146,11 @@ public class BlabAPI {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                log.i(TAG,"path:::"+path);
-
-                File f = new File(path);
-                log.i(TAG,"f:::"+f);
-                String content_type = getMimeType(path);
+                log.i(TAG,"thumbnail path:::"+thumbPath);
+                String originPath = thumbPath.replace("thumbnail/", "");
+                log.i(TAG,"originPath path:::"+originPath);
+                File f = new File(originPath);
+                String content_type = getMimeType(originPath);
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
 

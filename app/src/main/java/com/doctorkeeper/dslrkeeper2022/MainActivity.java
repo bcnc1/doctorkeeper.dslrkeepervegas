@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +38,9 @@ import com.doctorkeeper.dslrkeeper2022.view.SessionView;
 import com.doctorkeeper.dslrkeeper2022.view.WebViewDialogFragment;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -139,6 +143,30 @@ public class MainActivity extends SessionActivity implements CameraListener {
             showLoginDialog();
         }else {
             Log.w(TAG,"자동로그인");
+            MadamfiveAPI.loginDoctorKeeper(SmartFiPreference.getDoctorId(this), SmartFiPreference.getSfDoctorPw(this), new JsonHttpResponseHandler() {
+                @Override
+                public void onStart() {
+                    Log.i(TAG, "onStart:");
+                }
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
+                    Log.i(TAG, "HTTPa:" + statusCode + responseString);
+                    if(statusCode == 400 || statusCode == 401 || statusCode == 204 || statusCode == 403) {
+                        Log.i(TAG, "auto login id/pw not matched.");
+                    }else{
+                        Log.i(TAG, "responseString:::"+responseString);
+//                        SmartFiPreference.setSfToken(getActivity(),obj.getString("token"));
+//                        Log.i(TAG,"token:::"+obj.getString("token"));
+                    }
+                }
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    Log.w(TAG,"failed statusCode : " + statusCode);
+                    Log.w(TAG,"failed headers : " + headers);
+                    Log.w(TAG,"failed responseString : " + responseString);
+                }
+            });
         }
 
         countDownTimer = new MyCountDownTimer(startTime, interval);

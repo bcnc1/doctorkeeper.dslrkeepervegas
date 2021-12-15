@@ -24,10 +24,15 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
+
+import static com.loopj.android.http.AsyncHttpClient.log;
 
 
 public class CloudGalleryFragment extends BaseFragment implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener{
@@ -89,13 +94,13 @@ public class CloudGalleryFragment extends BaseFragment implements AdapterView.On
 
         pictureMap = new HashMap<>();
         pictureMap = cloudGalleryAdapter.getItem(position);
-
+//        log.i("pictureMap", String.valueOf(pictureMap));
         if(pictureMap.get("cameraKind") == "Video"){
             Toast.makeText(getActivity(), "비디오파일은 미리보기가 제공되지 않습니다!", Toast.LENGTH_SHORT).show();
         } else{
-            String imageUrl = pictureMap.get("url");
+            String imageUrl = pictureMap.get("fileName");
             String imageGuid = pictureMap.get("guid");
-
+//            log.i("imageUrl", imageUrl);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.cloud_detail_container, CloudPictureFragment.newInstance(cloudGalleryAdapter.getItemHandle(position), imageUrl, imageGuid), null);
             ft.addToBackStack(null);
@@ -130,60 +135,51 @@ public class CloudGalleryFragment extends BaseFragment implements AdapterView.On
     public void onScroll(AbsListView absListView, int i, int i1, int i2) {
     }
 
+
     private void getImagesList(){
 
         imageInfoList = new ArrayList<HashMap<String, String>>();
-
-        MadamfiveAPI.getImageURL("0",new JsonHttpResponseHandler() {
+        MadamfiveAPI.getImageLists(MadamfiveAPI.getContext(), new JsonHttpResponseHandler(){
             @Override
-            public void onStart() {
-                Log.i("CLoud Approach", "onStart2:");
-            }
-
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
-
-                Log.d(TAG, "HTTP21:" + statusCode + responseString);
-                try {
-                    JSONObject response = new JSONObject(responseString);
-                    JSONArray imagesArray = response.getJSONArray("posts");
-
-                    for(int i=0;i<imagesArray.length();i++){
-                        JSONObject imagesObject = imagesArray.getJSONObject(i);
-//                        Log.i(TAG,"Inside JSON Array");
-                        Log.i(TAG,"Inside value : "+ imagesObject.get("id").toString());
-                        HashMap<String,String> imageInfo = new HashMap<>();
-                        imageInfo.put("url",imagesObject.getString("id"));
-                        imageInfo.put("uploadDate",imagesObject.getString("created"));
-                        try{
-                            imageInfo.put("cameraKind",imagesObject.getString("title"));
-                        }catch(Exception e){
-                            imageInfo.put("cameraKind","DSLR");
-                        }
-                        try {
-                            JSONArray attachmentArray = imagesArray.getJSONObject(i).getJSONArray("attachments");
-                            JSONObject attach = attachmentArray.getJSONObject(0);
-                            imageInfo.put("guid", attach.getString("guid"));
-                        }catch (Exception e){
-                            imageInfo.put("guid", "none");
-                        }
-//                        Log.i(TAG,"Inside HashMap : "+ imageInfo.toString());
-                        imageInfoList.add(imageInfo);
-                    }
-                    cloudGalleryAdapter.setItems(imageInfoList);
-                    cloudGalleryAdapter.notifyDataSetChanged();
-                    Log.i("CloudFragment","list received! === length:"+imageInfoList.size());
-                }catch (Exception e){
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.v(TAG,"response length:::"+response.length());
+                for(int i=0;i<response.length();i++){
+                    try {
+                        JSONObject j = response.getJSONObject(i);
+                        HashMap<String,String> h = new HashMap<>();
+                        h.put("fileName",j.getString("name"));
+                        h.put("created",j.getString("last_modified"));
+                        h.put("bytes",j.getString("bytes"));
+                        imageInfoList.add(h);
+                    }catch(Exception e){}
                 }
+                Collections.sort(imageInfoList, new Comparator<HashMap< String,String >>() {
+                    @Override
+                    public int compare(HashMap<String, String> lhs,
+                                       HashMap<String, String> rhs) {
+                        String firstValue = lhs.get("created");
+                        String secondValue = rhs.get("created");
+                        return secondValue.compareTo(firstValue);
+                    }
+                });
+//                if(imageInfoList.size()>20){
+//                    imageInfoList = (ArrayList<HashMap<String, String>>) imageInfoList.subList(0,20);
+//                }
+                cloudGalleryAdapter.setItems(imageInfoList);
+                cloudGalleryAdapter.notifyDataSetChanged();
+//                Log.i("imageInfoList", String.valueOf(imageInfoList));
+
+                Log.i("CloudFragment","list received! === length:"+imageInfoList.size());
             }
 
             @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
-                Log.d("CLoud", "HTTP22:" + statusCode + response.toString());
-//                galleryAdapter.notifyDataSetChanged();
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.v(TAG,"responseString:::"+responseString);
             }
         });
+
         Log.i("List in CloudFragment",imageInfoList.size()+"");
     }
 

@@ -210,6 +210,18 @@ public class MadamfiveAPI {
     }
 
 
+    public static void getImageLists(Context con, JsonHttpResponseHandler handler) {
+        String url = Constants.Storage.BASE_URL;
+        String hostipalId = SmartFiPreference.getHospitalId(getContext());
+        final String urlTarget = url + "/" + hostipalId + "/?limit=1000&format=json";
+        String token = SmartFiPreference.getSfToken(getContext());
+        log.i(TAG, "url:::" + urlTarget);
+
+        client.addHeader("X-Auth-Token", token);
+        client.get(con, urlTarget, handler);
+
+    }
+
 
     public static void login(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
@@ -486,6 +498,8 @@ public class MadamfiveAPI {
 
     }
 
+
+
     public static void getImageURL (String page, final JsonHttpResponseHandler responseHandler){
         Log.i(TAG, "getImageURL");
 //        if (mAcccessToken==null) {
@@ -538,6 +552,60 @@ public class MadamfiveAPI {
         VolleySingleton.getInstance(mContext).addToRequestQueue(request);
 
     }
+
+
+//    public static void getImageURL (String page, final JsonHttpResponseHandler responseHandler){
+//        Log.i(TAG, "getImageURL");
+////        if (mAcccessToken==null) {
+////           return;
+////        }
+//        mAcccessToken = getAccessToken();
+//        boardId = getBoardId();
+//
+//        String queryString = "type=smartfi&fetchTotalCount=true&orderDirection=desc&mode=all";
+//        queryString = queryString+"&limit=50&page="+page+"&accessToken="+URLEncoder.encode(mAcccessToken);
+//        String relativeURL = "boards/"+boardId+"/posts?"+queryString;
+//
+//        Log.i("URL=====", getAbsoluteUrl(relativeURL).toString());
+//
+//        JsonObjectRequest request = new JsonObjectRequest(getAbsoluteUrl(relativeURL), null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//
+//                            if (response.has("total")) {
+//                                responseHandler.onSuccess(200, null, response.toString());
+//                            }else{
+//                                responseHandler.onSuccess(400, null, response.toString());
+//                            }
+////                            Log.i(TAG, "Response:%n %s" + response.get("total").toString());
+//                        } catch (Exception e) {
+////                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.i(TAG, "Error: " + error.getMessage());
+//                responseHandler.onFailure(0, null, error.getLocalizedMessage(), null);
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("X-Madamfive-APIKey", mAPIKey);
+//                return params;
+//            }
+//
+//        };
+//
+//        request.setRetryPolicy(new DefaultRetryPolicy(10000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+//
+//    }
 
     public static void getPatientList(String name, String chartNo, JsonHttpResponseHandler handler){
         String url = Constants.bcnc.BASE_URL + "/api/v1/patient/search?";

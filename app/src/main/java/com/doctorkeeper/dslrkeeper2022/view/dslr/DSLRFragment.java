@@ -399,7 +399,7 @@ public class DSLRFragment extends SessionFragment implements
     @Override
     public void onImageInfoRetrieved(final int objectHandle, final ObjectInfo objectInfo, final Bitmap thumbnail) {
 
-        //Log.d(TAG,"dslr받음 => onImageInfoRetrieved");
+        Log.d(TAG,"dslr받음 => onImageInfoRetrieved");
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -508,7 +508,7 @@ public class DSLRFragment extends SessionFragment implements
         //썸네일 만들고 db에 해당 정보 저장하고 업로드 매니저 호출
         String path = DisplayUtil.storeDslrImage(mFile.toString(),
                 getActivity().getExternalFilesDir(Environment.getExternalStorageState()),mFileName, bitmap, thumb);
-
+        Log.i(TAG, "sendPhoto path:" + path);
         if(path != null){
             PhotoModel photoModel = PhotoModelService.addPhotoModel(getActivity(), mFile.toString(),path, mFileName, 1);
             Long id = photoModel.getId();
