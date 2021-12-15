@@ -199,6 +199,7 @@ public class DSLRFragment extends SessionFragment implements
         IntentFilter off = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
         MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
         MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
+        Log.i(TAG,"isCameraOn = "+ BlabAPI.isCameraOn);
 
         patient_name_dslr.setText(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
         // Display Doctor info : OPTION

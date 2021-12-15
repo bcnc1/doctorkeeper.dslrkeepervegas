@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
 import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
@@ -65,6 +66,15 @@ public class LoginDialogFragment extends DialogFragment {
 
         usernameTextView = (TextView) view.findViewById(R.id.input_email);
         passwordTextView = (TextView) view.findViewById(R.id.input_password);
+
+        String spId = SmartFiPreference.getHospitalId(getActivity());
+        String spPwd = SmartFiPreference.getSfDoctorPw(getActivity());
+        Log.i(TAG, "spId:" + spId);
+        Log.i(TAG, "spPwd:" + spPwd);
+        if(!spId.isEmpty() && spId != "undefined"){
+            usernameTextView.setText(spId);
+//            passwordTextView.setText(spPwd);
+        }
 
         final Button loginButton = (Button)view.findViewById(R.id.btn_login);
 
