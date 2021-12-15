@@ -143,46 +143,43 @@ public class BlabAPI {
         log.i(TAG,"url:::"+url);
         log.i(TAG,"doctorId:::"+doctorId+"token:::"+token);
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                log.i(TAG,"thumbnail path:::"+thumbPath);
-                String originPath = thumbPath.replace("thumbnail/", "");
-                log.i(TAG,"originPath path:::"+originPath);
-                File f = new File(originPath);
-                String content_type = getMimeType(originPath);
-                OkHttpClient client = new OkHttpClient();
-                RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
+        Thread t = new Thread(() -> {
+            log.i(TAG,"thumbnail path:::"+thumbPath);
+            String originPath = thumbPath.replace("thumbnail/", "");
+            log.i(TAG,"originPath path:::"+originPath);
+            File f = new File(originPath);
+            String content_type = getMimeType(originPath);
+            OkHttpClient client = new OkHttpClient();
+            RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
 
-                okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url(urlTarget)
-                        .put(file_body)
-                        .addHeader("X-Auth-Token", token)
-                        .build();
+            okhttp3.Request request = new okhttp3.Request.Builder()
+                    .url(urlTarget)
+                    .put(file_body)
+                    .addHeader("X-Auth-Token", token)
+                    .build();
 
-                try {
-                    okhttp3.Response response = client.newCall(request).execute();
-                    log.w(TAG, response.toString());
-                    //response.body()
+            try {
+                okhttp3.Response response = client.newCall(request).execute();
+                log.w(TAG, response.toString());
+                //response.body()
 
-                    if (!response.isSuccessful()) {
-                        // throw new IOException("Error : "+response);
-                        handler.onFailure(response.code(), null, response.toString(), null);
+                if (!response.isSuccessful()) {
+                    // throw new IOException("Error : "+response);
+                    handler.onFailure(response.code(), null, response.toString(), null);
+                } else {
+                    handler.onSuccess(response.code(), null, "");
+                    log.i(TAG,"response.code() : "+response.code());
+
+                    if (response.code()==201) {
+                        log.i(TAG,"Image upload success");
                     } else {
-                        handler.onSuccess(response.code(), null, "");
-                        log.i(TAG,"response.code() : "+response.code());
-
-                        if (response.code()==201) {
-                            log.i(TAG,"Image upload success");
-                        } else {
-                            log.i(TAG,"Image upload failed");
-                        }
-
+                        log.i(TAG,"Image upload failed");
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    log.w(TAG, e.toString());
+
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.w(TAG, e.toString());
             }
         });
         t.start();

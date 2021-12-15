@@ -16,8 +16,13 @@
 package com.doctorkeeper.dslrkeeper2022.view.dslr;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -37,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doctorkeeper.dslrkeeper2022.R;
+import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
@@ -152,6 +158,24 @@ public class DSLRFragment extends SessionFragment implements
     private File mFile;
     private final String  DEVICE = "dslr";
 
+    private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.w(TAG,"usbOnReciever === "+intent);
+            new android.os.Handler().postDelayed(
+                    () -> BlabAPI.isCameraOn = true,
+                    2000);
+        }
+    };
+
+    private final BroadcastReceiver usbOffReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.w(TAG,"usbOffReciever === "+intent);
+            BlabAPI.isCameraOn = false;
+        }
+    };
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -170,8 +194,13 @@ public class DSLRFragment extends SessionFragment implements
 
         patient_name_dslr = (TextView)view.findViewById(R.id.patient_name_dslr);
         Log.i(TAG,"초기이름 = "+ SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
-        patient_name_dslr.setText(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
 
+        IntentFilter on = new IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        IntentFilter off = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
+        MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
+
+        patient_name_dslr.setText(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
         // Display Doctor info : OPTION
         doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(MadamfiveAPI.getActivity());
         doctor_name_dslr = (TextView)view.findViewById(R.id.doctor_name_dslr);
@@ -269,21 +298,16 @@ public class DSLRFragment extends SessionFragment implements
         if (getActivity()==null)
             return;
 
-        (getActivity()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (enabled) {
-
-                    dslrTextView.setText("촬영 가능 합니다 ");
-                    connectedImageView.setImageDrawable(getResources().getDrawable(R.drawable.conn_after));
-                    camera_ready_Notice.setVisibility(View.VISIBLE);
-                } else {
-                    dslrTextView.setText("카메라를 연결해 주세요 ");
-                    connectedImageView.setImageDrawable(getResources().getDrawable(R.drawable.conn_before));
-                    camera_ready_Notice.setVisibility(View.GONE);
-                    readImage.setVisibility(View.GONE);
-                }
+        (getActivity()).runOnUiThread(() -> {
+            if (enabled) {
+                dslrTextView.setText("촬영 가능 합니다 ");
+                connectedImageView.setImageDrawable(getResources().getDrawable(R.drawable.conn_after));
+                camera_ready_Notice.setVisibility(View.VISIBLE);
+            } else {
+                dslrTextView.setText("카메라를 연결해 주세요 ");
+                connectedImageView.setImageDrawable(getResources().getDrawable(R.drawable.conn_before));
+                camera_ready_Notice.setVisibility(View.GONE);
+                readImage.setVisibility(View.GONE);
             }
         });
 
