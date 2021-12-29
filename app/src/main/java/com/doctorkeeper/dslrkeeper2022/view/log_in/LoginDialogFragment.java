@@ -115,8 +115,10 @@ public class LoginDialogFragment extends DialogFragment {
                                                 SmartFiPreference.setTnhPwd(BcncAPI.getContext(),passwordTextView.getText().toString());
                                                 SmartFiPreference.setHospitalId(BcncAPI.getContext(),hospitalNumberTextView.getText().toString());
 
+//                                                Log.w(TAG,"get access-token : "+SmartFiPreference.getSfToken(BcncAPI.getContext()));
                                                 Log.w(TAG,"access-token : "+j1.getString("access-token"));
                                                 SmartFiPreference.setSfToken(BcncAPI.getContext(),j1.getString("access-token"));
+
                                                 String accessTokenCreatedTime = System.currentTimeMillis()+"";
 
                                                 SmartFiPreference.setSfTokenTime(BcncAPI.getContext(),accessTokenCreatedTime);

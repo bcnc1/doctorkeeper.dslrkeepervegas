@@ -2,7 +2,7 @@ package com.doctorkeeper.dslrkeeper2022.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 
 import com.doctorkeeper.dslrkeeper2022.Constants;
 
@@ -154,6 +154,21 @@ public class SmartFiPreference {
         setString(con, SF_DOCTOR_NUMBER, name);
     }
 
+    public static String getOrgId(Context con){
+        return getString(con, SF_PATIENT_ID, "sf-patient");
+    }
+
+    public static void setOrgId(Context con, String id){
+        setString(con, SF_PATIENT_ID, id);
+    }
+
+    public static String getSfPatientCustId(Context con){
+        return getString(con, SF_PATIENT_CUST_NO, "");
+    }
+
+    public static void setSfPatientCustId(Context con, String no){
+        setString(con, SF_PATIENT_CUST_NO, no);
+    }
 //    public static final String getSfPatientCategoryid(Context con){
 //        return getString(con, SF_PATIENT_CATEGORYID, "");
 //    }

@@ -306,7 +306,7 @@ public class BlabAPI {
      */
     public static void searchPatient(Context con, String searchByName, String searchByChart, ResponseHandlerInterface responseHandler){
 
-        if(!getNetworkStatus(con)){
+        if(!BcncAPI.isNetworkConnected()){
             Toast.makeText(con, con.getString(R.string.check_network), Toast.LENGTH_SHORT);
             return;
         }
@@ -504,6 +504,7 @@ public class BlabAPI {
         getActivity().startService(it);
 
     }
+
 
     public static boolean getNetworkStatus(Context con){
 

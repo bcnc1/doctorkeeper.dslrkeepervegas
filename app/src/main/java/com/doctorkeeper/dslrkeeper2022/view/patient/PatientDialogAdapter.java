@@ -16,7 +16,6 @@ import java.util.List;
 
 //import static com.doctorkeeper.dslrkeeper.madamfive.MadamfiveAPI.patientSearchDisplayExtraOption;
 
-
 public class PatientDialogAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
@@ -52,7 +51,6 @@ public class PatientDialogAdapter extends BaseAdapter {
         return i;
     }
 
-    @SuppressLint("ViewHolder")
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
 
@@ -61,31 +59,20 @@ public class PatientDialogAdapter extends BaseAdapter {
         patient_name = (TextView) view.findViewById(R.id.patient_name);
         patient_chartNumber = (TextView) view.findViewById(R.id.patient_chartNumber);
 
-        patientSearchDisplayExtraOption = SmartFiPreference.getSfDisplayExtraOpt(BcncAPI.getActivity());
         HashMap<String, String> patientInfo = getItem(i);
-        if(patientSearchDisplayExtraOption){
-            patient_name.setText(patientInfo.get("name"));
-            if(patientInfo.get("birthDate") == null){
-                patient_chartNumber.setText("");
-            }else{
-                patient_chartNumber.setText(patientInfo.get("birthDate"));
-            }
-        }else {
-            String name = patientInfo.get("name");
-//            Log.i("TAG", "name : " + name);
-            if(name==null){
-                name = "";
-            }
-            patient_name.setText(name);
-
-            String chartNumber = patientInfo.get("chrtNo");
-//            Log.i("TAG", "chartNumber : " + chartNumber);
-            if(chartNumber==null){
-                chartNumber = "";
-            }
-
-            patient_chartNumber.setText(chartNumber);
+        String name = patientInfo.get("CUSTNAME");
+        if(name.equals("null")){
+            name = "";
         }
+        patient_name.setText(name);
+
+        String chartNumber = patientInfo.get("CUSTNO");
+
+        if(chartNumber.equals("null")){
+            chartNumber = "";
+        }
+
+        patient_chartNumber.setText(chartNumber);
         if(getCount()==0)   patient_name.setText("결과 없음");
 
         return view;

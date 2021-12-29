@@ -61,6 +61,7 @@ import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.ResponseHandlerInterface;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class BcncAPI {
@@ -211,6 +212,12 @@ public class BcncAPI {
         return true;
     }
 
+    public static boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
     public static void loginDoctorKeeper(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
         HashMap<String, String> params = new HashMap<String, String>();
@@ -264,6 +271,43 @@ public class BcncAPI {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+
+    }
+
+    public static void searchPatient(Context con, String searchByName, String searchByChart, ResponseHandlerInterface responseHandler){
+        String url = Constants.vegas.BASE_URL+"/patient?";
+        StringEntity jsonEntity = null;
+        RequestParams requestParams = new RequestParams();
+        String token = SmartFiPreference.getSfToken(BcncAPI.getContext());
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("CUSTNAME", searchByName);
+            jsonParams.put("CUSTNO", searchByChart);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Log.v(TAG,jsonParams.toString());
+            jsonEntity = new StringEntity(jsonParams.toString());
+            Log.v(TAG,jsonEntity.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        requestParams.put("filter",jsonParams);
+        requestParams.put("offset","0");
+        requestParams.put("limit","100");
+
+        Log.v(TAG,url+requestParams);
+
+        client.addHeader("Accept", "application/json");
+        client.addHeader("Content-Type", "application/json");
+
+        Log.v(TAG,"patient search token : " + token);
+        client.addHeader(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+
+        client.get(con, url, requestParams ,responseHandler);
 
     }
 
