@@ -7,8 +7,11 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -20,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.doctorkeeper.dslrkeeper2022.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
@@ -38,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -59,16 +64,21 @@ import static com.loopj.android.http.AsyncHttpClient.log;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.ResponseHandlerInterface;
+import com.loopj.android.http.SyncHttpClient;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.entity.StringEntity;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 public class BcncAPI {
 
     private static final String TAG = BcncAPI.class.getSimpleName();
     private static AsyncHttpClient client = new AsyncHttpClient();
-
+    private static SyncHttpClient client2 = new SyncHttpClient();
     private static Cache mCache;
 
     private static Activity mActivity;
@@ -114,6 +124,177 @@ public class BcncAPI {
     public static void setContext(Activity activity, Context context) {
         mActivity = activity;
         mContext = context;
+    }
+
+    public static void postToastMessage(final String message) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+//                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(mActivity.getBaseContext(), message, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        });
+    }
+
+    private static String getMimeType(String path) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+    }
+
+    public static void uploadImage(final String filePath, final ResponseHandlerInterface handler) throws UnsupportedEncodingException {
+        Log.v(TAG,"filePath UploadImage : " + filePath);
+//        postToastMessage("hi");
+        if (!BcncAPI.isNetworkConnected()) {
+            postToastMessage(BlabAPI.getContext().getString(R.string.check_network));
+            return;
+        }
+
+        // login for token
+        if(!checkTokenValidity()) {
+            BcncAPI.SyncLoginTNH(getContext(),
+                    SmartFiPreference.getTnhId(getContext()),
+                    SmartFiPreference.getTnhPwd(getContext()),
+                    SmartFiPreference.getHospitalId(getContext()),
+                    new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.w(TAG, "성공 = " + response);
+                            for (Header h : headers) {
+                                Log.w(TAG, "h = " + h);
+                                if (h.toString().contains("Authorization")) {
+                                    try {
+                                        JSONObject j1 = new JSONObject(h.toString().replace("Authorization: ", ""));
+                                        Log.w(TAG, "j1 = " + j1);
+
+                                        Log.w(TAG, "access-token" + j1.getString("access-token"));
+                                        SmartFiPreference.setSfToken(getActivity(), j1.getString("access-token"));
+                                        String accessTokenCreatedTime = System.currentTimeMillis() + "";
+
+                                        SmartFiPreference.setSfTokenTime(getActivity(), accessTokenCreatedTime);
+                                        Log.w(TAG, "refresh-token" + j1.getString("refresh-token"));
+                                        SmartFiPreference.setSfRefToken(getActivity(), j1.getString("refresh-token"));
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        Log.w(TAG, "j1 error = " + e);
+                                    }
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                            Log.w(TAG, "errorResponse" + errorResponse);
+                            Log.w(TAG, "statusCode" + statusCode);
+                        }
+                    });
+        }
+
+        Thread t = new Thread(() -> {
+
+            // Extract file name
+            String filename=filePath.substring(filePath.lastIndexOf("/")+1);
+            Log.v(TAG,"filename : " + filename);
+
+            // Extract CUSTOMERID in file name
+            String[] names = filename.split("_");
+            String customerId = names[0];
+            Log.v(TAG,"customerId : " + customerId);
+
+            String originalPath = filePath.replace("thumbnail/", "");
+            String content_type = getMimeType(filePath);
+
+            OkHttpClient client = new OkHttpClient();
+            Log.v(TAG,"origin:"+originalPath);
+            Log.v(TAG,"thumbnail:"+filePath);
+
+            String url = Constants.vegas.BASE_URL + "/upload";
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("CUSTOMERID",customerId)
+                    .addFormDataPart("IMAGE",originalPath,RequestBody.create(new File(originalPath), MediaType.parse(content_type)))
+                    .addFormDataPart("THUMBNAIL",filePath,RequestBody.create(new File(filePath), MediaType.parse(content_type)))
+                    .build();
+
+            okhttp3.Request request = new okhttp3.Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .addHeader("Authorization", "Bearer " + getAccessToken())
+                    .build();
+
+            try {
+                okhttp3.Response response = client.newCall(request).execute();
+                Log.v(TAG,">>><<<"+response.toString());
+                //response.body()
+                if (!response.isSuccessful()) {
+                    throw new IOException("Error : "+response);
+                } else {
+                    getActivity().runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(mActivity.getBaseContext(), "이미지 업로드 성공!", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                        String CheckFolderPath = mContext.getExternalFilesDir(null).getAbsolutePath() + "/uploadCheck";
+                        Log.v(TAG,"CheckFolderPath : "+ CheckFolderPath);
+                        File dir = new File(CheckFolderPath);
+                        if(!dir.exists()){
+                            Log.v(TAG,"CheckFolder not exists");
+                            dir.mkdirs();
+                        }
+                        Log.v(TAG,"filename : " + filename);
+
+                        // write empty file
+                        Log.v(TAG,"check name : "+ CheckFolderPath + "/" + filename);
+                        try {
+                            FileOutputStream fos = new FileOutputStream(CheckFolderPath + "/" + filename, true);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                    });
+                }
+
+                countDownTimer.cancel();
+                countDownTimer.start();
+
+            } catch (IOException e) {
+                postToastMessage("업로드  실패");
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+
+    public static void SyncLoginTNH(Context con, String id, String pw, String hospitalNumber, ResponseHandlerInterface handler){
+        String url = Constants.vegas.BASE_URL+"/login";
+//        StringEntity jsonEntity = null;
+        StringEntity jsonEntityUTF8 = null;
+        String EncodedId = URLEncoder.encode(id);
+        Log.w(TAG,id+"::"+pw+"::"+hospitalNumber);
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("USERID", id);
+            jsonParams.put("PW", pw);
+            jsonParams.put("ORGNO", hospitalNumber);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //            jsonEntity = new StringEntity(jsonParams.toString());
+
+        //set json to StringEntity
+        jsonEntityUTF8 = new StringEntity(jsonParams.toString(), HTTP.UTF_8);
+
+        Log.w(TAG,jsonParams.toString());
+
+        client2.addHeader("Accept", "application/json");
+        client2.addHeader("charset", "utf-8");
+        client2.post(con, url,jsonEntityUTF8,"application/json",handler);
     }
 
     public static void loginTNH(Context con, String id, String pw, String hospitalNumber, ResponseHandlerInterface handler) throws UnsupportedEncodingException {

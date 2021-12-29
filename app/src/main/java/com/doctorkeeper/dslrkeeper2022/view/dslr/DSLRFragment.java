@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.doctorkeeper.dslrkeeper2022.view.dslr;
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
@@ -62,6 +63,7 @@ import com.doctorkeeper.dslrkeeper2022.view.phone_camera.PhoneCameraPhotoAdapter
 import com.doctorkeeper.dslrkeeper2022.view.sdcard.SDCardFragment;
 import com.doctorkeeper.dslrkeeper2022.view.sdcard.StorageAdapter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -509,35 +511,37 @@ public class DSLRFragment extends SessionFragment implements
 
     }
 
+    @SuppressLint("ShowToast")
     private void sendPhoto(int objectHandle, ObjectInfo info, Bitmap thumb, Bitmap bitmap) throws UnsupportedEncodingException {
 //        Log.d(TAG, "sendPhoto");
         currentObjectHandle = 0;
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
-        String HospitalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
-        String PatientName = SmartFiPreference.getSfPatientName(BcncAPI.getActivity());
-        String PatientChart = SmartFiPreference.getPatientChart(BcncAPI.getActivity());
-        String DoctorName = SmartFiPreference.getSfDoctorName(BcncAPI.getActivity());
-        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(BcncAPI.getActivity());
+        String tnhPatientChart = SmartFiPreference.getPatientChart(BcncAPI.getContext());
+        String tnhPatientId = SmartFiPreference.getSfPatientCustId(BcncAPI.getContext());
+        mFileName = tnhPatientId+"_"+timeStamp+".jpg";
+        Log.v(TAG,">>>"+tnhPatientId+":"+tnhPatientChart);
+        mFile = new File(BcncAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
 
-        if (doctorSelectExtraOption && DoctorName != null && DoctorName.length() != 0) {
-            mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+DoctorName+"_"+DoctorNumber+"_"+timeStamp+".jpg", "UTF-8");
-        } else {
-            mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+timeStamp+".jpg", "UTF-8");
-        }
-
-        Log.i(TAG, "mFileName:" + mFileName);
-
-
-        mFile = new File(getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
 
         //썸네일 만들고 db에 해당 정보 저장하고 업로드 매니저 호출
-        String path = DisplayUtil.storeDslrImage(mFile.toString(),
-                getActivity().getExternalFilesDir(Environment.getExternalStorageState()),mFileName, bitmap, thumb);
-        Log.i(TAG, "sendPhoto path:" + path);
+//        String path = DisplayUtil.storeDslrImage(mFile.toString(),
+//                getActivity().getExternalFilesDir(Environment.getExternalStorageState()),mFileName, bitmap, thumb);
+        String srcPath = mFile.toString();
+        byte[] capturedImage2 = "Any String you want".getBytes();
+        try{
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            capturedImage2 = stream.toByteArray();
+        }catch(Exception e){
+        }
+        String path = DisplayUtil.storePictureNThumbImage(srcPath, getActivity().getExternalFilesDir(Environment.getExternalStorageState()), mFileName, capturedImage2);
+        Log.i(TAG,"path:"+path);
         if(path != null){
-            PhotoModel photoModel = PhotoModelService.addPhotoModel(getActivity(), mFile.toString(),path, mFileName, 1);
-            Long id = photoModel.getId();
+//            PhotoModel photoModel = PhotoModelService.addPhotoModel(getActivity(), mFile.toString(),path, mFileName, 1);
+//            Long id = photoModel.getId();
+
             PictureIntentService.startUploadPicture(getActivity(), path);
+
         }else{
             Toast.makeText(getActivity(), R.string.make_error_thumbnail, Toast.LENGTH_SHORT);
         }

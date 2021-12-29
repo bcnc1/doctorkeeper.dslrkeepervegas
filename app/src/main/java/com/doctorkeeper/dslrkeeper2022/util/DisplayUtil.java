@@ -8,6 +8,7 @@ import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.webkit.MimeTypeMap;
 
@@ -55,7 +56,8 @@ public class DisplayUtil {
 
     static final int THUMB_WIDTH = 255;
     static final int THUMB_HEIGHT = 170;
-
+    static final int TNH_THUMB_WIDTH = 75;
+    static final int TNH_THUMB_HEIGHT = 100;
     public static final Bitmap getThumbBitMapImage(String filePath){
         Bitmap source = BitmapFactory.decodeFile(filePath);
 
@@ -129,7 +131,7 @@ public class DisplayUtil {
         //store thumb image
         Bitmap source = BitmapFactory.decodeFile(storeOriPath);
 
-        Bitmap bitmapThumb = ThumbnailUtils.extractThumbnail(source, THUMB_WIDTH, THUMB_HEIGHT,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+        Bitmap bitmapThumb = ThumbnailUtils.extractThumbnail(source, TNH_THUMB_WIDTH, TNH_THUMB_HEIGHT,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
 
        // Bitmap rotateThumb = rotate(bitmapThumb, 90);//90도회전
 
@@ -153,6 +155,55 @@ public class DisplayUtil {
             return path;
         }
     }
+
+    public static String storePictureNThumbImage(String storeOriPath, File storeThumbPath, String fileName, byte[] capturedImage){
+        String path = null;
+
+        File file = new File(storeThumbPath, "/thumbnail/");
+
+        if (!file.isDirectory()) {
+            if (file.mkdir()) {
+                Log.d(TAG, "make thumbnail folder success");
+            } else {
+                Log.d(TAG, "make thumbnail folder failed");
+            }
+        }
+
+        //store source image
+        try{
+            FileOutputStream outPicStream = new FileOutputStream(storeOriPath);
+//            ori.compress(Bitmap.CompressFormat.JPEG, 100, outPicStream);
+            outPicStream.write(capturedImage);
+            outPicStream.close();
+
+        } catch (IOException e){
+            e.printStackTrace();
+            return path;
+        }
+
+        //store thumb image
+        Bitmap source = BitmapFactory.decodeFile(storeOriPath);
+        Bitmap bitmapThumb = ThumbnailUtils.extractThumbnail(source, TNH_THUMB_WIDTH, TNH_THUMB_HEIGHT,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+
+        // Bitmap rotateThumb = rotate(bitmapThumb, 90);//90도회전
+
+        try {
+            FileOutputStream outThumbStream = new FileOutputStream(file.getAbsolutePath()+ File.separator +fileName); //파일저장
+            //  rotateThumb.compress(Bitmap.CompressFormat.JPEG, 100, outThumbStream); //
+            bitmapThumb.compress(Bitmap.CompressFormat.JPEG, 100, outThumbStream);
+            outThumbStream.close();
+            path = file.getAbsolutePath()+ File.separator +fileName;
+            return path;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return path;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return path;
+        }
+    }
+
 
     public static String storeDslrImage(String storeOriPath, File storeThumbPath, String fileName, Bitmap ori, Bitmap thumb){
         String path = null;

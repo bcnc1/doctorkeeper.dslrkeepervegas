@@ -142,15 +142,15 @@ public class PatientDialogFragment extends DialogFragment {
                                                     Log.w(TAG,"j1 = "+j1);
 
                                                     Log.w(TAG,"access-token"+j1.getString("access-token"));
-                                                    SmartFiPreference.setSfToken(BlabAPI.getContext(),j1.getString("access-token"));
+                                                    SmartFiPreference.setSfToken(BcncAPI.getContext(),j1.getString("access-token"));
                                                     String accessTokenCreatedTime = System.currentTimeMillis()+"";
 
-                                                    SmartFiPreference.setSfTokenTime(BlabAPI.getContext(),accessTokenCreatedTime);
+                                                    SmartFiPreference.setSfTokenTime(BcncAPI.getContext(),accessTokenCreatedTime);
                                                     Log.w(TAG,"refresh-token"+j1.getString("refresh-token"));
-                                                    SmartFiPreference.setSfRefToken(BlabAPI.getContext(),j1.getString("refresh-token"));
+                                                    SmartFiPreference.setSfRefToken(BcncAPI.getContext(),j1.getString("refresh-token"));
 
-                                                    Log.v(TAG,"network check : " + BlabAPI.getNetworkStatus(BlabAPI.getActivity()));
-                                                    if(BlabAPI.getNetworkStatus(BlabAPI.getActivity())){
+                                                    Log.v(TAG,"network check : " + BcncAPI.getNetworkStatus(BcncAPI.getActivity()));
+                                                    if(BlabAPI.getNetworkStatus(BcncAPI.getActivity())){
                                                         name = nameTextView.getText().toString();
                                                         chartNumber = chartNumberTextView.getText().toString();
                                                         if (name == null && name.length() == 0) {
@@ -217,7 +217,8 @@ public class PatientDialogFragment extends DialogFragment {
             SmartFiPreference.setSfPatientCustId(BcncAPI.getContext(),patientInfo.get("CUSTOMERID"));
             SmartFiPreference.setSfPatientName(BcncAPI.getContext(), name);
             SmartFiPreference.setPatientChart(BcncAPI.getContext(),patientInfo.get("CUSTNO"));
-
+            String tnhPatientId = SmartFiPreference.getSfPatientCustId(BcncAPI.getContext());
+            Log.v(TAG,"tnhPatientId : " + tnhPatientId);
             Log.v(TAG,patientInfo.get("ORGID")+":"+patientInfo.get("CUSTOMERID")+":"+patientInfo.get("CUSTNO")+":"+name);
 //                SmartFiPreference.setSfPatientCustNo(getActivity(), patientInfo.get("custNo"));
 //                SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chartNumber"));

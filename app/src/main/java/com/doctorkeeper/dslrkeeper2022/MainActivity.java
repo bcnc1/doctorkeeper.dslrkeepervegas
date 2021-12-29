@@ -134,8 +134,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
         ptp = PtpService.Singleton.getInstance(this);
 
-        if(SmartFiPreference.getDoctorId(this).equals(Constants.EMRAPI.UNDEFINED)
-            || SmartFiPreference.getSfToken(this).equals(Constants.EMRAPI.UNDEFINED)){
+        if(SmartFiPreference.getSfToken(this).equals("")){
             Log.w(TAG,"로그인되어 있지 않음");
             showLoginDialog();
         }else {

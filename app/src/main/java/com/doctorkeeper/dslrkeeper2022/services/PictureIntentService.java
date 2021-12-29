@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -145,46 +146,23 @@ public class PictureIntentService extends IntentService {
                 }
                 Log.i(TAG,"uploadImage => Read Bitmap");
 
-                BlabAPI.uploadImage(path, bytes, new JsonHttpResponseHandler(){
-                    @Override
-                    public void onStart() {
-                        Log.i(TAG, "Uploading");
-                    }
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        Log.d(TAG, "Success1:" + statusCode + response);
-                        Toast.makeText(BlabAPI.getActivity(),"이미지 저장 완료!",Toast.LENGTH_SHORT).show();
-                        deleteFiles();
-                    }
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String response) {
-                        super.onSuccess(statusCode, headers, response);
-                        Log.d(TAG, "Success2:" + statusCode);
-                        Handler handler = new Handler(Looper.getMainLooper());
-
-                        if (statusCode==201) {
-                            handler.postDelayed(() -> {
-                                Toast toast = Toast.makeText(mCon, "업로드 성공", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }, 0);
-                        } else {
-                            handler.postDelayed(() -> {
-                                Toast toast = Toast.makeText(mCon, "업로드 실패", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }, 0);
+                try {
+                    BcncAPI.uploadImage(path, new JsonHttpResponseHandler(){
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.w(TAG,response.toString());
                         }
 
-                        deleteFiles();
-                    }
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        Log.d(TAG, "Failure:" + statusCode + responseString);
-                    }
-                });
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                            Log.w(TAG,responseString);
+                        }
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
 
                 Log.i(TAG,"uploadImage => Finished");
 
