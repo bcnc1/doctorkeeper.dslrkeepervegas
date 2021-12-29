@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 
 import java.io.File;
 import java.util.List;
 
-import static com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI.getActivity;
+import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.getActivity;
 
 
 public class PhoneCameraPhotoAdapter extends RecyclerView.Adapter<PhoneCameraPhotoAdapter.MyViewHolder> {
@@ -87,7 +87,7 @@ public class PhoneCameraPhotoAdapter extends RecyclerView.Adapter<PhoneCameraPho
         Log.i("XXX", "position:"+photo.getFilename()+","+position);
 
         File f = new File(photo.getFullpath());
-        Glide.with(MadamfiveAPI.getActivity()).load(f).centerCrop().into(holder.imageView);
+        Glide.with(BcncAPI.getActivity()).load(f).centerCrop().into(holder.imageView);
 
         if (photo.getMode()==1) {
             holder.dslr.setVisibility(View.VISIBLE);

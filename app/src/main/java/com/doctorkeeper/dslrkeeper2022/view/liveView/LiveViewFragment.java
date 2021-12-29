@@ -40,7 +40,7 @@ import android.widget.Toast;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.PictureView;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.PtpConstants;
@@ -657,7 +657,7 @@ public class LiveViewFragment extends SessionFragment implements
         }
         Log.i(TAG,"uploadImage =>  Read Bitmap");
 
-        MadamfiveAPI.createPost(bytes, "DSLR", 0L, new JsonHttpResponseHandler() {
+        BcncAPI.createPost(bytes, "DSLR", 0L, new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
                 Log.i("AsyncTask", "Uploading");

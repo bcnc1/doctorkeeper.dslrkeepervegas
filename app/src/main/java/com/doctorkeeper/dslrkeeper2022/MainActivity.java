@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doctorkeeper.dslrkeeper2022.activities.AppSettingsActivity;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera.CameraListener;
 import com.doctorkeeper.dslrkeeper2022.ptp.PtpService;
@@ -39,8 +38,6 @@ import com.doctorkeeper.dslrkeeper2022.view.WebViewDialogFragment;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.json.JSONObject;
 
 import java.io.File;
 
@@ -115,7 +112,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
         }
         setContentView(R.layout.main);
 
-        MadamfiveAPI.setContext(this, getApplicationContext());
+        BcncAPI.setContext(this, getApplicationContext());
 
         settings = new AppSettings(this);
 
@@ -143,7 +140,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
             showLoginDialog();
         }else {
             Log.w(TAG,"자동로그인");
-            MadamfiveAPI.loginDoctorKeeper(SmartFiPreference.getDoctorId(this), SmartFiPreference.getSfDoctorPw(this), new JsonHttpResponseHandler() {
+            BcncAPI.loginDoctorKeeper(SmartFiPreference.getDoctorId(this), SmartFiPreference.getSfDoctorPw(this), new JsonHttpResponseHandler() {
                 @Override
                 public void onStart() {
                     Log.i(TAG, "onStart:");
@@ -172,7 +169,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
         countDownTimer = new MyCountDownTimer(startTime, interval);
         countDownTimer.start();
 
-        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(MadamfiveAPI.getActivity());
+        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(BcncAPI.getActivity());
         if(fixedLandscapeExtraOption){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         }
@@ -541,8 +538,8 @@ public class MainActivity extends SessionActivity implements CameraListener {
         public void onFinish() {
             Log.w(TAG,"Timer Completed");
 
-            MadamfiveAPI.deleteImage();
-            MadamfiveAPI.deletePhotoModelList();
+            BcncAPI.deleteImage();
+            BcncAPI.deletePhotoModelList();
 
             finish();
             System.exit(0);

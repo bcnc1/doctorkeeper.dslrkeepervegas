@@ -8,12 +8,19 @@ import com.doctorkeeper.dslrkeeper2022.Constants;
 
 public class SmartFiPreference {
     public static final String SF_TOKEN = "smartfi.token";
+    public static final String SF_TOKEN_TIME = "smartfi.token.time";
+    public static final String SF_REF_TOKEN = "smartfi.refresh.token";
+
     public static final String SF_HOSPITAL_ID = "smartfi.hospital.id";
     public static final String SF_DOCTOR_ID = "smartfi.doctor.id";
     public static final String SF_PATIENT_ID = "smartfi.patient.id";
     public static final String SF_PATIENT_CHART = "smartfi.patient.chart";
     public static final String SF_DOCTOR_PW = "smartfi.doctor.password";
 //    public static final String SF_PATIENT_CATEGORYID = "smartfi.patient.categoryid";
+
+    public static final String TNH_ID = "smartfi.tnh.id";
+    public static final String TNH_PWD = "smartfi.tnh.pwd";
+    public static String TNH_ACCESS_TIME = "19701111222233";
 
     public static final String SF_PATIENT_CUST_NO = "smartfi.patient.cust.no";
     public static final String SF_PATIENT_NAME = "smartfi.patient.name";
@@ -27,26 +34,60 @@ public class SmartFiPreference {
     public static final String SHOOT_PORTRAIT = "smartfi.shoot.portrait";
     public static final String DISPLAY_LANDSCAPE = "smartfi.display.landscape";
 
-    public static void defaultPreference(Context context){
 
-    }
-
+    // AccessToken
     public static String getSfToken(Context con){
-        return getString(con, SF_TOKEN, Constants.EMRAPI.UNDEFINED);
+        return getString(con, SF_TOKEN, "");
     }
-
     public static void setSfToken(Context con, String tk){
         setString(con, SF_TOKEN, tk);
     }
 
-    public static final String getHospitalId(Context con){
-        //000000000001
-        return getString(con, SF_HOSPITAL_ID, Constants.EMRAPI.UNDEFINED);
+    // AccessToken Time TNH AccessToken 유효기간 30분
+    public static String getSfTokenTime(Context con){
+        return getString(con, SF_TOKEN_TIME, "");
+    }
+    public static void setSfTokenTime(Context con, String tk){
+        setString(con, SF_TOKEN_TIME, tk);
     }
 
+    // TNH ID
+    public static String getTnhId(Context con){
+        return getString(con, TNH_ID, "");
+    }
+    public static void setTnhId(Context con, String tk){ setString(con, TNH_ID, tk); }
+
+    // TNH PWD
+    public static String getTnhPwd(Context con){
+        return getString(con, TNH_PWD, "");
+    }
+    public static void setTnhPwd(Context con, String tk){
+        setString(con, TNH_PWD, tk);
+    }
+
+    // RefreshToken
+    public static void setSfRefToken(Context con, String pw){
+        setString(con, SF_REF_TOKEN, pw);
+    }
+    public static String getSfRefToken(Context con){
+        return getString(con, SF_REF_TOKEN, "");
+    }
+
+    // TNH Hospital Number
+    public static String getHospitalId(Context con){ return getString(con, SF_HOSPITAL_ID, Constants.EMRAPI.UNDEFINED); }
     public static void setHospitalId(Context con, String id){
         setString(con, SF_HOSPITAL_ID, id);
     }
+
+    // login CheckTime
+    public static void setSfCheckTime(String time) {
+        TNH_ACCESS_TIME = time;
+    }
+    public static String getSfCheckTime(){
+        return TNH_ACCESS_TIME;
+    }
+
+
 
     public static final String getDoctorId(Context con){
         return getString(con, SF_DOCTOR_ID, Constants.EMRAPI.UNDEFINED);

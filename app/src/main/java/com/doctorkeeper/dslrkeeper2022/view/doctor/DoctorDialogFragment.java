@@ -19,11 +19,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BlabAPI;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 
@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI.selectedDoctor;
+import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.selectedDoctor;
 
 public class DoctorDialogFragment extends DialogFragment {
 
@@ -61,10 +61,10 @@ public class DoctorDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ArrayList<HashMap<String, String>> DoctorInfoList = new ArrayList<HashMap<String, String>>();
-        if (MadamfiveAPI.getAccessToken() == null) {
+        if (BcncAPI.getAccessToken() == null) {
             showLoginDialog();
         }
-        if (MadamfiveAPI.getBoardId() == null) {
+        if (BcncAPI.getBoardId() == null) {
             showLoginDialog();
         }
 
@@ -107,7 +107,7 @@ public class DoctorDialogFragment extends DialogFragment {
 
                 nameTextView.clearFocus();
                 chartNumberTextView.clearFocus();
-                MadamfiveAPI.getDoctorList(doctorName, doctorNumber, new JsonHttpResponseHandler() {
+                BcncAPI.getDoctorList(doctorName, doctorNumber, new JsonHttpResponseHandler() {
                     @Override
                     public void onStart() {
                         Log.i(TAG, "onStart:");
@@ -208,7 +208,7 @@ public class DoctorDialogFragment extends DialogFragment {
             final String doctorNumber = chartNumberTextView.getText().toString();
             Log.i(TAG, "Doctor name : " + doctorName);
             Log.i(TAG, "Doctor number : " + doctorNumber);
-            MadamfiveAPI.insertDoctor(BlabAPI.getContext(), doctorName, doctorNumber, new JsonHttpResponseHandler() {
+            BcncAPI.insertDoctor(BlabAPI.getContext(), doctorName, doctorNumber, new JsonHttpResponseHandler() {
                 @Override
                 public void onStart() {
                     Log.i(TAG, "onStart: Insert Patient");

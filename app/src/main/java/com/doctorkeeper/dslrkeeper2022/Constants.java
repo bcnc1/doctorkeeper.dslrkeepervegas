@@ -10,6 +10,10 @@ public class Constants {
         public static final String UPLOAD_MESSAGE_CALLBACK = "upload.message.callback";
     }
 
+    public static final class vegas{
+        public static final String BASE_URL = "https://smartfitest.vegas-solution.com";
+    }
+
     public static final class m5{
         public static final String BASE_URL = "http://api.doctorkeeper.com:7818";
     }

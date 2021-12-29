@@ -70,6 +70,25 @@
                 android:layout_marginTop="15dp"
                 android:hint="PW"/>
         </LinearLayout>
+        <!--  ORGNO Label -->
+        <LinearLayout
+            android:background="#d8d8d8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/input_hospital_number"
+                android:background="@android:color/transparent"
+                android:textStyle="bold"
+                android:textSize="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:textColor="@color/black"
+                android:inputType="textEmailAddress"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:hint="ORGNO"/>
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

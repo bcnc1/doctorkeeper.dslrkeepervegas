@@ -13,20 +13,19 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Messenger;
-import android.os.Parcelable;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BlabAPI;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
 import com.doctorkeeper.dslrkeeper2022.activities.FileExploreActivity;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
-import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
@@ -200,7 +199,7 @@ public class PictureIntentService extends IntentService {
     private void deleteFiles(){
         Log.i(TAG,"Delete Files Started");
 
-        File directory = new File(MadamfiveAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())+File.separator);
+        File directory = new File(BcncAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())+File.separator);
         File[] files = directory.listFiles();
         Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
         Log.d(TAG, "Delete Size: "+ files.length);

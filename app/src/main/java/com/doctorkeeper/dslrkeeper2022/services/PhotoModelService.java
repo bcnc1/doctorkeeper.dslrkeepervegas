@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI.getActivity;
+import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.getActivity;
 
 
 public class PhotoModelService {

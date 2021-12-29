@@ -2,14 +2,13 @@ package com.doctorkeeper.dslrkeeper2022.view.patient;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
 import java.util.HashMap;
@@ -62,7 +61,7 @@ public class PatientDialogAdapter extends BaseAdapter {
         patient_name = (TextView) view.findViewById(R.id.patient_name);
         patient_chartNumber = (TextView) view.findViewById(R.id.patient_chartNumber);
 
-        patientSearchDisplayExtraOption = SmartFiPreference.getSfDisplayExtraOpt(MadamfiveAPI.getActivity());
+        patientSearchDisplayExtraOption = SmartFiPreference.getSfDisplayExtraOpt(BcncAPI.getActivity());
         HashMap<String, String> patientInfo = getItem(i);
         if(patientSearchDisplayExtraOption){
             patient_name.setText(patientInfo.get("name"));

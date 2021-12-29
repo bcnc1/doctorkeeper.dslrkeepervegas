@@ -33,9 +33,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
-import com.doctorkeeper.dslrkeeper2022.services.PictureIntentService;
 import com.doctorkeeper.dslrkeeper2022.services.VideoIntentService;
 import com.doctorkeeper.dslrkeeper2022.view.BaseFragment;
 
@@ -106,7 +105,7 @@ public class PhonePictureFragment extends BaseFragment
                 if(fullPath.contains("jpg")){
 //                    PictureIntentService.startUploadPicture(MadamfiveAPI.getActivity(), Long.parseLong(photoModelId));
                 }else{
-                    VideoIntentService.startUploadVideo(MadamfiveAPI.getActivity(),Long.parseLong(photoModelId));
+                    VideoIntentService.startUploadVideo(BcncAPI.getActivity(),Long.parseLong(photoModelId));
                 }
                 getActivity().getFragmentManager().popBackStack();
             }
@@ -121,7 +120,7 @@ public class PhonePictureFragment extends BaseFragment
 
         File f = new File(fullPath);
 
-        Glide.with(MadamfiveAPI.getActivity()).load(f)
+        Glide.with(BcncAPI.getActivity()).load(f)
             .listener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

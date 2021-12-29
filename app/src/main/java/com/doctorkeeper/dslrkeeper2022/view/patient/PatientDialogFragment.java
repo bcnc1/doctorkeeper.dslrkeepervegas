@@ -19,12 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BlabAPI;
 import com.doctorkeeper.dslrkeeper2022.view.dslr.DSLRFragment;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 
@@ -90,7 +90,7 @@ public class PatientDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                if(MadamfiveAPI.getNetworkStatus(MadamfiveAPI.getActivity())){
+                if(BcncAPI.getNetworkStatus(BcncAPI.getActivity())){
                     patient_list_progressBar.setVisibility(View.VISIBLE);
 
                     String keyword = "";
@@ -117,7 +117,7 @@ public class PatientDialogFragment extends DialogFragment {
 
                     searchPatientOpt(name, chartNumber);
                 }else {
-                    Toast.makeText(MadamfiveAPI.getActivity(), getString(R.string.check_network), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BcncAPI.getActivity(), getString(R.string.check_network), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -135,8 +135,8 @@ public class PatientDialogFragment extends DialogFragment {
 //                SmartFiPreference.setSfPatientCustNo(getActivity(),patientInfo.get("custNo"));
                 SmartFiPreference.setSfPatientName(getActivity(), name);
                 SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chrtNo"));
-                Log.i(TAG, "getSfPatientName: " + SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
-                Log.i(TAG, "getPatientChart: " + SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity()));
+                Log.i(TAG, "getSfPatientName: " + SmartFiPreference.getSfPatientName(BcncAPI.getActivity()));
+                Log.i(TAG, "getPatientChart: " + SmartFiPreference.getPatientChart(BcncAPI.getActivity()));
 //                SmartFiPreference.setSfPatientCustNo(getActivity(), patientInfo.get("custNo"));
 //                SmartFiPreference.setPatientChart(getActivity(),patientInfo.get("chartNumber"));
 //                SmartFiPreference.setSfPatientName(getActivity(),name);
@@ -164,7 +164,7 @@ public class PatientDialogFragment extends DialogFragment {
 
         }
 
-        MadamfiveAPI.getPatientList(searchName, searchChart, new JsonHttpResponseHandler(){
+        BcncAPI.getPatientList(searchName, searchChart, new JsonHttpResponseHandler(){
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -212,7 +212,7 @@ public class PatientDialogFragment extends DialogFragment {
 
     private void searchPatient(final String searchName, final String searchChart) {
 
-        MadamfiveAPI.searchPatient(searchName, searchChart, new JsonHttpResponseHandler() {
+        BcncAPI.searchPatient(searchName, searchChart, new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
                 Log.i(TAG, "searchPatient onStart:");
@@ -304,7 +304,7 @@ public class PatientDialogFragment extends DialogFragment {
                     return;
                 }
 
-                MadamfiveAPI.insertPatient(BlabAPI.getContext(), name, chartNumber, new JsonHttpResponseHandler() {
+                BcncAPI.insertPatient(BlabAPI.getContext(), name, chartNumber, new JsonHttpResponseHandler() {
                 @Override
                 public void onStart() {
                     Log.i(TAG, " onStart: insertPatient ");
@@ -356,7 +356,7 @@ public class PatientDialogFragment extends DialogFragment {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = (int) (metrics.widthPixels * .85);
         int height = (int) (metrics.heightPixels * .60);
-        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(MadamfiveAPI.getActivity());
+        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(BcncAPI.getActivity());
 //        if(fixedLandscapeExtraOption){
 //            height = (int) (metrics.heightPixels * .90);
 //            width= (int) (metrics.widthPixels * .60);

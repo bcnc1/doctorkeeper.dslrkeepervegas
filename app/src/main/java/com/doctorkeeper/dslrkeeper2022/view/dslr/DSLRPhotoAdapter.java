@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.view.AspectRatioImageView;
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
@@ -156,7 +156,7 @@ public class DSLRPhotoAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                if (MadamfiveAPI.getAccessToken() == null) {
+                if (BcncAPI.getAccessToken() == null) {
                     showLoginDialog();
                 }
                 else {
@@ -173,7 +173,7 @@ public class DSLRPhotoAdapter extends BaseAdapter {
 
     public void showLoginDialog() {
 
-        FragmentTransaction changelogTx = MadamfiveAPI.getActivity().getFragmentManager().beginTransaction();
+        FragmentTransaction changelogTx = BcncAPI.getActivity().getFragmentManager().beginTransaction();
         LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance();
         changelogTx.add(loginDialogFragment, "로그인");
         changelogTx.commit();
@@ -186,7 +186,7 @@ public class DSLRPhotoAdapter extends BaseAdapter {
         holder.progressBar.setVisibility(View.VISIBLE);
         holder.thumbView.setVisibility(View.INVISIBLE);
         try {
-            MadamfiveAPI.createPost(photoModel.getFullpath(), photoModel.getMode().toString(), new JsonHttpResponseHandler() {
+            BcncAPI.createPost(photoModel.getFullpath(), photoModel.getMode().toString(), new JsonHttpResponseHandler() {
                 @Override
                 public void onStart() {
                     Log.i("CAMERA", "onStart2:");

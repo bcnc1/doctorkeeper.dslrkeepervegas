@@ -19,7 +19,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
 import com.doctorkeeper.dslrkeeper2022.activities.FileExploreActivity;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
@@ -114,7 +114,7 @@ public class VideoIntentService extends IntentService {
                 }
                 Log.i(TAG,"upload Video => Read MP4");
 
-                MadamfiveAPI.createPost(bytes, "Video", photoModelId, new JsonHttpResponseHandler() {
+                BcncAPI.createPost(bytes, "Video", photoModelId, new JsonHttpResponseHandler() {
                     @Override
                     public void onStart() {
                         Log.i("AsyncTask", "Uploading");

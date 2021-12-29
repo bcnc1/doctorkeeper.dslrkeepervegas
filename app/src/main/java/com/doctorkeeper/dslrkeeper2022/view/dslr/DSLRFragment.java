@@ -42,8 +42,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BlabAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.PtpConstants;
@@ -75,8 +75,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI.shootingImageDisplayExtraOption;
-import static com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI.selectedDoctor;
+import static com.doctorkeeper.dslrkeeper2022.API.BlabAPI.shootingImageDisplayExtraOption;
+import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.selectedDoctor;
 
 public class DSLRFragment extends SessionFragment implements
         Camera.RetrieveImageListener,
@@ -193,25 +193,25 @@ public class DSLRFragment extends SessionFragment implements
 //        galleryAdapter = new DSLRPhotoAdapter(getActivity());
 
         patient_name_dslr = (TextView)view.findViewById(R.id.patient_name_dslr);
-        Log.i(TAG,"초기이름 = "+ SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
+        Log.i(TAG,"초기이름 = "+ SmartFiPreference.getSfPatientName(BcncAPI.getActivity()));
 
         IntentFilter on = new IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         IntentFilter off = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
-        MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
+        BcncAPI.getContext().registerReceiver(usbOnReciever,on);
+        BcncAPI.getContext().registerReceiver(usbOffReciever,off);
         Log.i(TAG,"isCameraOn = "+ BlabAPI.isCameraOn);
 
-        patient_name_dslr.setText(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
+        patient_name_dslr.setText(SmartFiPreference.getSfPatientName(BcncAPI.getActivity()));
         // Display Doctor info : OPTION
-        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(MadamfiveAPI.getActivity());
+        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(BcncAPI.getActivity());
         doctor_name_dslr = (TextView)view.findViewById(R.id.doctor_name_dslr);
         if(!doctorSelectExtraOption){
             btn_search_doctor_dslr.setVisibility(View.GONE);
             doctor_name_dslr.setVisibility(View.GONE);
         }else{
             HashMap<String,String> doctor = new HashMap<>();
-            String name = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
-            String number =SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+            String name = SmartFiPreference.getSfDoctorName(BcncAPI.getActivity());
+            String number =SmartFiPreference.getSfDoctorNumber(BcncAPI.getActivity());
             doctor.put("name", name);
             doctor.put("doctorNumber", number);
             selectedDoctor = doctor;
@@ -229,7 +229,7 @@ public class DSLRFragment extends SessionFragment implements
         photo_container = (RelativeLayout) view.findViewById(R.id.dslr_photo_container);
         photo_container.setVisibility(View.INVISIBLE);
 //
-        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(MadamfiveAPI.getActivity().getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(BcncAPI.getActivity().getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
 //        listviewPhoto.setLayoutManager(horizontalLayoutManagaer);
 //
         phonePhotoAdapter = new PhoneCameraPhotoAdapter(photoList);
@@ -238,7 +238,7 @@ public class DSLRFragment extends SessionFragment implements
         enableUi(false);
 //        enableUi(true);
 
-        shootingImageDisplayExtraOption = SmartFiPreference.getSfShootDisplayOpt(MadamfiveAPI.getActivity());
+        shootingImageDisplayExtraOption = SmartFiPreference.getSfShootDisplayOpt(BcncAPI.getActivity());
         if(shootingImageDisplayExtraOption){
             photo_container.setVisibility(View.VISIBLE);
         }
@@ -513,11 +513,11 @@ public class DSLRFragment extends SessionFragment implements
 //        Log.d(TAG, "sendPhoto");
         currentObjectHandle = 0;
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
-        String HospitalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
-        String PatientName = SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity());
-        String PatientChart = SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity());
-        String DoctorName = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
-        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+        String HospitalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
+        String PatientName = SmartFiPreference.getSfPatientName(BcncAPI.getActivity());
+        String PatientChart = SmartFiPreference.getPatientChart(BcncAPI.getActivity());
+        String DoctorName = SmartFiPreference.getSfDoctorName(BcncAPI.getActivity());
+        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(BcncAPI.getActivity());
 
         if (doctorSelectExtraOption && DoctorName != null && DoctorName.length() != 0) {
             mFileName = URLEncoder.encode(HospitalId+"_"+PatientName+"_"+PatientChart+"_"+DoctorName+"_"+DoctorNumber+"_"+timeStamp+".jpg", "UTF-8");

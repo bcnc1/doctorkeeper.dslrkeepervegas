@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.view.BaseFragment;
 
 import org.json.JSONArray;
@@ -31,8 +31,6 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-
-import static com.loopj.android.http.AsyncHttpClient.log;
 
 
 public class CloudGalleryFragment extends BaseFragment implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener{
@@ -139,7 +137,7 @@ public class CloudGalleryFragment extends BaseFragment implements AdapterView.On
     private void getImagesList(){
 
         imageInfoList = new ArrayList<HashMap<String, String>>();
-        MadamfiveAPI.getImageLists(MadamfiveAPI.getContext(), new JsonHttpResponseHandler(){
+        BcncAPI.getImageLists(BcncAPI.getContext(), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);

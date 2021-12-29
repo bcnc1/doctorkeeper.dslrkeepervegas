@@ -1,4 +1,4 @@
-package com.doctorkeeper.dslrkeeper2022.madamfive;
+package com.doctorkeeper.dslrkeeper2022.API;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
@@ -28,6 +28,7 @@ import com.doctorkeeper.dslrkeeper2022.services.PhotoModelService;
 import com.doctorkeeper.dslrkeeper2022.util.SSLConnect;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,12 +39,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,12 +58,14 @@ import static com.loopj.android.http.AsyncHttpClient.log;
 
 import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.ResponseHandlerInterface;
 
+import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
-public class MadamfiveAPI {
+public class BcncAPI {
 
-    private static final String TAG = MadamfiveAPI.class.getSimpleName();
+    private static final String TAG = BcncAPI.class.getSimpleName();
     private static AsyncHttpClient client = new AsyncHttpClient();
 
     private static Cache mCache;
@@ -108,6 +115,102 @@ public class MadamfiveAPI {
         mContext = context;
     }
 
+    public static void loginTNH(Context con, String id, String pw, String hospitalNumber, ResponseHandlerInterface handler) throws UnsupportedEncodingException {
+        String url = Constants.vegas.BASE_URL+"/login";
+        StringEntity jsonEntityUTF8 = null;
+        String EncodedId = URLEncoder.encode(id, "UTF-8");
+
+        Log.w(TAG,id+"::"+pw+"::"+hospitalNumber);
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("USERID", id);
+            jsonParams.put("PW", pw);
+            jsonParams.put("ORGNO", hospitalNumber);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        jsonEntityUTF8 = new StringEntity(jsonParams.toString(), HTTP.UTF_8);
+
+        Log.w(TAG,jsonParams.toString());
+
+        client.addHeader("Accept", "application/json");
+        client.addHeader("charset", "utf-8");
+        client.post(con, url,jsonEntityUTF8,"application/json",handler);
+    }
+
+    public static void vegasLoginCheck(String id, String orgno) throws UnsupportedEncodingException {
+//        Log.w(TAG,"Vegas Login Check");
+
+        loginCheck(BlabAPI.getContext(),id,orgno,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.w(TAG,response.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Log.w(TAG,errorResponse.toString());
+            }
+
+            // ----New Overridden method
+            @Override
+            public boolean getUseSynchronousMode() {
+                return false;
+            }
+
+        });
+    }
+
+    public static void loginCheck(Context con, String id, String orgno, ResponseHandlerInterface handler) throws UnsupportedEncodingException {
+        Log.w(TAG,"check Login Vegas");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+        String currentDateTime = sdf.format(new Date());
+        SmartFiPreference.setSfCheckTime(currentDateTime);
+
+        String url = Constants.bcnc.BASE_URL+"/api/v1/dev/checkTNH";
+        StringEntity jsonEntity = null;
+        String encodedId = URLEncoder.encode(id, java.nio.charset.StandardCharsets.UTF_8.toString());
+        String encodedNo = URLEncoder.encode(orgno, java.nio.charset.StandardCharsets.UTF_8.toString());
+        Log.w(TAG,"Vegas : "+ encodedId + " / " + encodedNo);
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("id", encodedId);
+            jsonParams.put("orgno", encodedNo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            jsonEntity = new StringEntity(jsonParams.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+//        client.addHeader("Accept", "application/json");
+        client.post(con,url,jsonEntity,"application/json",handler);
+    }
+
+    public static boolean checkTokenValidity(){
+
+        Long startTime = Long.parseLong(SmartFiPreference.getSfTokenTime(getContext()));
+        Long currentTime = System.currentTimeMillis();
+        Long difference = currentTime - startTime;
+//        Log.v(TAG,"currentTime::"+currentTime);
+//        Log.v(TAG,"startTime::"+startTime);
+        Log.v(TAG,"DIF::"+difference/60000);
+
+//        if(difference > 1){
+        if(difference > 25*60*1000){
+//            autoLogin();
+            return false;
+        }
+        return true;
+    }
+
     public static void loginDoctorKeeper(String username, String password, final JsonHttpResponseHandler responseHandler) {
 
         HashMap<String, String> params = new HashMap<String, String>();
@@ -117,7 +220,7 @@ public class MadamfiveAPI {
                 response -> {
                     Log.i(TAG, "response : " + response);
                     try {
-                        if (response.has("token") == true) {
+                        if (response.has("token")) {
                             mAcccessToken = URLDecoder.decode(response.getString("token"));
                             SmartFiPreference.setDoctorId(getActivity(),username);
                             SmartFiPreference.setSfDoctorPw(getActivity(),password);
@@ -322,7 +425,7 @@ public class MadamfiveAPI {
 
     public static void showLoginDialog() {
 
-        FragmentTransaction changelogTx = MadamfiveAPI.getActivity().getFragmentManager().beginTransaction();
+        FragmentTransaction changelogTx = BcncAPI.getActivity().getFragmentManager().beginTransaction();
         LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance();
         changelogTx.add(loginDialogFragment, "로그인");
         changelogTx.commit();

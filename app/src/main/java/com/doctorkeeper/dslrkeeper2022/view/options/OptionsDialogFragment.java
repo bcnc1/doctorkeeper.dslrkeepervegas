@@ -28,7 +28,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 
 //import static com.doctorkeeper.dslrkeeper.madamfive.MadamfiveAPI.doctorSelectExtraOption;
@@ -99,7 +99,7 @@ public class OptionsDialogFragment extends DialogFragment {
         switch_options_patient_insert_activate = (Switch) view.findViewById(R.id.switch_options_patient_insert_activate);
         switch_options_patient_insert_activate.setChecked(false);
 
-        patientInsertExtraOption = SmartFiPreference.getSfInsertPatientOpt(MadamfiveAPI.getActivity());
+        patientInsertExtraOption = SmartFiPreference.getSfInsertPatientOpt(BcncAPI.getActivity());
 
         Log.w(TAG,"patientInsertExtraOption = "+patientInsertExtraOption);
         if(patientInsertExtraOption){
@@ -112,11 +112,11 @@ public class OptionsDialogFragment extends DialogFragment {
                 if(patientInsertExtraOption){
                     patientInsertExtraOption = false;
                     switch_options_patient_insert_activate.setChecked(false);
-                    SmartFiPreference.setSfInsertPatientOpt(MadamfiveAPI.getActivity(),patientInsertExtraOption);
+                    SmartFiPreference.setSfInsertPatientOpt(BcncAPI.getActivity(),patientInsertExtraOption);
                 }else {
                     patientInsertExtraOption = true;
                     switch_options_patient_insert_activate.setChecked(true);
-                    SmartFiPreference.setSfInsertPatientOpt(MadamfiveAPI.getActivity(),patientInsertExtraOption);
+                    SmartFiPreference.setSfInsertPatientOpt(BcncAPI.getActivity(),patientInsertExtraOption);
                 }
             }
         });
@@ -125,7 +125,7 @@ public class OptionsDialogFragment extends DialogFragment {
         switch_options_doctor_insert_activate = (Switch) view.findViewById(R.id.switch_options_doctor_insert_activate);
         switch_options_doctor_insert_activate.setChecked(false);
 
-        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(MadamfiveAPI.getActivity());
+        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(BcncAPI.getActivity());
         if(doctorSelectExtraOption){
             switch_options_doctor_insert_activate.setChecked(true);
         }
@@ -140,7 +140,7 @@ public class OptionsDialogFragment extends DialogFragment {
                     doctorSelectExtraOption = true;
                     switch_options_doctor_insert_activate.setChecked(true);
                 }
-                SmartFiPreference.setSfInsertDoctorOpt(MadamfiveAPI.getActivity(),doctorSelectExtraOption);
+                SmartFiPreference.setSfInsertDoctorOpt(BcncAPI.getActivity(),doctorSelectExtraOption);
             }
         });
 

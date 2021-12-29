@@ -43,7 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.PtpConstants;
@@ -677,11 +677,11 @@ public class GalleryFragment extends SessionFragment
         //삭제 예정
        //sendPhoto(currentObjectInfo, currentBitmap);
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
-        String HospitalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
-        String PatientName = SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity());
-        String PatientChart = SmartFiPreference.getPatientChart(MadamfiveAPI.getActivity());
-        String DoctorName = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
-        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+        String HospitalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
+        String PatientName = SmartFiPreference.getSfPatientName(BcncAPI.getActivity());
+        String PatientChart = SmartFiPreference.getPatientChart(BcncAPI.getActivity());
+        String DoctorName = SmartFiPreference.getSfDoctorName(BcncAPI.getActivity());
+        String DoctorNumber = SmartFiPreference.getSfDoctorNumber(BcncAPI.getActivity());
 
         if (DSLRFragment.doctorSelectExtraOption && DoctorName != null && DoctorName.length() != 0) {
             try {

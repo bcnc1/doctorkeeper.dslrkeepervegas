@@ -13,18 +13,14 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.AspectRatioImageView;
 
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
 import com.bumptech.glide.Glide;
-
-import static com.loopj.android.http.AsyncHttpClient.log;
 
 
 public class CloudGalleryAdapter extends BaseAdapter {
@@ -123,8 +119,8 @@ public class CloudGalleryAdapter extends BaseAdapter {
         holder.progressBar.setVisibility(View.INVISIBLE);
 //        accessToken = SmartFiPreference.getSfToken(getContext());
 
-        String token = SmartFiPreference.getSfToken(MadamfiveAPI.getActivity());
-        String hostipalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
+        String token = SmartFiPreference.getSfToken(BcncAPI.getActivity());
+        String hostipalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
         String imageUrl = Constants.Storage.BASE_URL+"/"+hostipalId+"/"+filename;
         GlideUrl glideUrl = new GlideUrl(imageUrl, new LazyHeaders.Builder()
                 .addHeader("X-Auth-Token", token).build());

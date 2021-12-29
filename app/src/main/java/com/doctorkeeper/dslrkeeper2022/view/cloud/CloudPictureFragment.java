@@ -38,13 +38,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.doctorkeeper.dslrkeeper2022.Constants;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.BaseFragment;
-
-import java.net.URLEncoder;
-
-import static com.loopj.android.http.AsyncHttpClient.log;
 
 
 public class CloudPictureFragment extends BaseFragment {
@@ -95,12 +91,12 @@ public class CloudPictureFragment extends BaseFragment {
             }
         });
 
-        String token = SmartFiPreference.getSfToken(MadamfiveAPI.getActivity());
-        String hostipalId = SmartFiPreference.getHospitalId(MadamfiveAPI.getActivity());
+        String token = SmartFiPreference.getSfToken(BcncAPI.getActivity());
+        String hostipalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
         String imageUrl2 = Constants.Storage.BASE_URL+"/"+hostipalId+"/"+imageUrl;
         GlideUrl glideUrl = new GlideUrl(imageUrl2, new LazyHeaders.Builder()
                 .addHeader("X-Auth-Token", token).build());
-        Glide.with(MadamfiveAPI.getActivity()).load(glideUrl).listener(new RequestListener<Drawable>() {
+        Glide.with(BcncAPI.getActivity()).load(glideUrl).listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 return false;

@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.ptp.Camera;
 import com.doctorkeeper.dslrkeeper2022.ptp.model.LiveViewData;
@@ -319,7 +319,7 @@ public class SDcardPictureFragment extends SessionFragment
 
         final PhotoModel photoModel = PhotoModelService.savePhoto(bytes, filename, 1);
 
-        MadamfiveAPI.createPost(bytes, "DSLR", 0L, new JsonHttpResponseHandler() {
+        BcncAPI.createPost(bytes, "DSLR", 0L, new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
                 Log.i("CAMERA", "onStart2:");

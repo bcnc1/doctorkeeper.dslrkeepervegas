@@ -30,14 +30,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.doctorkeeper.dslrkeeper2022.R;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.util.SmartFiPreference;
 import com.doctorkeeper.dslrkeeper2022.view.patient.PatientDialogFragment;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -63,71 +65,91 @@ public class LoginDialogFragment extends DialogFragment {
 
         final TextView usernameTextView;
         final TextView passwordTextView;
+        final TextView hospitalNumberTextView;
 
-        usernameTextView = (TextView) view.findViewById(R.id.input_email);
-        passwordTextView = (TextView) view.findViewById(R.id.input_password);
+        usernameTextView = view.findViewById(R.id.input_email);
+        passwordTextView = view.findViewById(R.id.input_password);
+        hospitalNumberTextView = view.findViewById(R.id.input_hospital_number);
 
-        String spId = SmartFiPreference.getHospitalId(getActivity());
-        String spPwd = SmartFiPreference.getSfDoctorPw(getActivity());
+        String spId = SmartFiPreference.getTnhId(BcncAPI.getActivity());
+        String spPwd = SmartFiPreference.getTnhPwd(BcncAPI.getActivity());
+        String spHsptNum = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
+
         Log.i(TAG, "spId:" + spId);
         Log.i(TAG, "spPwd:" + spPwd);
-        if(!spId.isEmpty() && spId != "undefined"){
+        Log.i(TAG, "spHsptNum:" + spHsptNum);
+        if(!spId.isEmpty() && !spPwd.isEmpty() && !spHsptNum.isEmpty()){
             usernameTextView.setText(spId);
-//            passwordTextView.setText(spPwd);
+            passwordTextView.setText(spPwd);
+            hospitalNumberTextView.setText(spHsptNum);
         }
 
-        final Button loginButton = (Button)view.findViewById(R.id.btn_login);
+        final Button loginButton = view.findViewById(R.id.btn_login);
 
         loginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.v(TAG,"login btn clicked");
                 loginButton.setEnabled(false);
-                MadamfiveAPI.loginDoctorKeeper(usernameTextView.getText().toString(), passwordTextView.getText().toString(), new JsonHttpResponseHandler() {
-                    @Override
-                    public void onStart() {
-                        Log.i(TAG, "onStart:");
-                    }
-                    @Override
-                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString) {
-                        Log.i(TAG, "HTTPa:" + statusCode + responseString);
-                        if(statusCode == 400 || statusCode == 401 || statusCode == 204 || statusCode == 403) {
-                            Toast toast = Toast.makeText(getActivity(), "아이디 또는 비밀번호를 확인해 주세요", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            loginButton.setEnabled(true);
-                        }else{
-                            dismiss();
-                            SmartFiPreference.setDoctorId(getActivity(),usernameTextView.getText().toString());
-                            SmartFiPreference.setSfDoctorPw(getActivity(),passwordTextView.getText().toString());
-//                            Log.i(TAG,"responseString:::"+responseString);
-//                            try{
-//                                JSONObject obj = new JSONObject(responseString);
-//                                SmartFiPreference.setSfToken(getActivity(),obj.getString("accessToken"));
-//                                JSONObject obj2 = new JSONArray(obj.getString("boards")).getJSONObject(0);
-//                                SmartFiPreference.setHospitalId(getActivity(),obj2.getString("id"));
-////                                Log.i(TAG,"Check:::"+SmartFiPreference.getHospitalId(getActivity()).toString()+SmartFiPreference.getSfToken(getActivity()).toString());
-//                            }catch(Exception e){
-//                                Log.d(TAG,e.toString());
-//                            }
-                            loginButton.setEnabled(true);
-                            startSelectPatient();
-                        }
-                    }
-                    @Override
-                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                        // If the response is JSONObject instead of expected JSONArray
-                        Log.i(TAG, "HTTPb:" + statusCode + response.toString());
-                        dismiss();
-                        startSelectPatient();
-                    }
-                    @Override
-                    public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        Log.w(TAG,"failed statusCode : " + statusCode);
-                        Log.w(TAG,"failed headers : " + headers);
-                        Log.w(TAG,"failed responseString : " + responseString);
-                    }
-                });
+                if(hospitalNumberTextView.getText().toString().isEmpty()){
+                    Toast.makeText(BcncAPI.getContext(),"병원번호를 입력해 주세요",Toast.LENGTH_LONG).show();
+                    loginButton.setEnabled(true);
+                    return;
+                }
+                try {
+                    BcncAPI.loginTNH(BcncAPI.getContext(),usernameTextView.getText().toString(),passwordTextView.getText().toString(),hospitalNumberTextView.getText().toString(),
+                            new JsonHttpResponseHandler(){
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    super.onSuccess(statusCode, headers, response);
+                                    Log.w(TAG,"성공 = "+response);
+                                    dismiss();
+                                    for(Header h : headers){
+                                        Log.w(TAG,"h = "+h);
+                                        if(h.toString().contains("Authorization")){
+                                            try {
+                                                JSONObject j1 = new JSONObject(h.toString().replace("Authorization: ",""));
+                                                Log.w(TAG,"j1 = "+j1);
+
+                                                SmartFiPreference.setTnhId(BcncAPI.getContext(),usernameTextView.getText().toString());
+                                                SmartFiPreference.setTnhPwd(BcncAPI.getContext(),passwordTextView.getText().toString());
+                                                SmartFiPreference.setHospitalId(BcncAPI.getContext(),hospitalNumberTextView.getText().toString());
+
+                                                Log.w(TAG,"access-token : "+j1.getString("access-token"));
+                                                SmartFiPreference.setSfToken(BcncAPI.getContext(),j1.getString("access-token"));
+                                                String accessTokenCreatedTime = System.currentTimeMillis()+"";
+
+                                                SmartFiPreference.setSfTokenTime(BcncAPI.getContext(),accessTokenCreatedTime);
+                                                Log.w(TAG,"refresh-token : "+j1.getString("refresh-token"));
+                                                SmartFiPreference.setSfRefToken(BcncAPI.getContext(),j1.getString("refresh-token"));
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                                Log.w(TAG,"j1 error = "+e);
+                                            }
+                                        }
+                                    }
+
+                                    try {
+                                        BcncAPI.vegasLoginCheck(usernameTextView.getText().toString(),hospitalNumberTextView.getText().toString());
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                    startSelectPatient();
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                                    Log.w(TAG,"errorResponse"+errorResponse);
+                                    Log.w(TAG,"statusCode"+statusCode);
+                                    Toast.makeText(BcncAPI.getContext(),"입력정보를 확인해 주세요",Toast.LENGTH_LONG).show();
+                                    loginButton.setEnabled(true);
+                                }
+                            });
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

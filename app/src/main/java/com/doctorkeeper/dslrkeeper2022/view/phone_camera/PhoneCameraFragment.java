@@ -28,8 +28,8 @@ import android.widget.Toast;
 import com.doctorkeeper.dslrkeeper2022.R;
 //import com.doctorkeeper.dslrkeeper.activities.LaunchCameraActivity;
 //import com.doctorkeeper.dslrkeeper.activities.LaunchVrecordActivity;
-import com.doctorkeeper.dslrkeeper2022.madamfive.BlabAPI;
-import com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BlabAPI;
+import com.doctorkeeper.dslrkeeper2022.API.BcncAPI;
 import com.doctorkeeper.dslrkeeper2022.models.PhotoModel;
 import com.doctorkeeper.dslrkeeper2022.services.PhotoModelService;
 import com.doctorkeeper.dslrkeeper2022.services.PictureIntentService;
@@ -59,7 +59,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.doctorkeeper.dslrkeeper2022.madamfive.MadamfiveAPI.selectedDoctor;
+import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.selectedDoctor;
 
 
 public class PhoneCameraFragment extends BaseFragment {
@@ -196,15 +196,15 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
 
         btnDslr.setVisibility(View.INVISIBLE);
         btnSDCard.setVisibility(View.INVISIBLE);
-        if(MadamfiveAPI.isCameraOn == true){
+        if(BcncAPI.isCameraOn == true){
             btnDslr.setVisibility(View.VISIBLE);
             btnSDCard.setVisibility(View.VISIBLE);
         }
 
-        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(MadamfiveAPI.getActivity().getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(BcncAPI.getActivity().getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         listviewPhoto.setLayoutManager(horizontalLayoutManagaer);
 
-        fixedPortraitExtraOption = SmartFiPreference.getSfShootPortraitOpt(MadamfiveAPI.getActivity());
+        fixedPortraitExtraOption = SmartFiPreference.getSfShootPortraitOpt(BcncAPI.getActivity());
 
         cameraView = (CameraView) view.findViewById(R.id.camera);
         cameraView.addCameraKitListener(new CameraKitEventListener() {
@@ -254,7 +254,7 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
         phoneCameraPhotoAdapter = new PhoneCameraPhotoAdapter(photoList);
         listviewPhoto.setAdapter(phoneCameraPhotoAdapter);
 
-        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(MadamfiveAPI.getActivity());
+        fixedLandscapeExtraOption = SmartFiPreference.getSfDisplayLandscapeOpt(BcncAPI.getActivity());
         if(!fixedLandscapeExtraOption){
 //            rotate1Animation = AnimationUtils.loadAnimation(MadamfiveAPI.getContext(), R.anim.rotate_1);
 //            rotate2Animation = AnimationUtils.loadAnimation(MadamfiveAPI.getContext(), R.anim.rotate_2);
@@ -267,24 +267,24 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
 
         patient_name = (TextView)view.findViewById(R.id.patient_name);
 
-        Log.w(TAG,"초기이름 = "+SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
-        patient_name.setText(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()));
+        Log.w(TAG,"초기이름 = "+SmartFiPreference.getSfPatientName(BcncAPI.getActivity()));
+        patient_name.setText(SmartFiPreference.getSfPatientName(BcncAPI.getActivity()));
 
         IntentFilter on = new IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         IntentFilter off = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        MadamfiveAPI.getContext().registerReceiver(usbOnReciever,on);
-        MadamfiveAPI.getContext().registerReceiver(usbOffReciever,off);
+        BcncAPI.getContext().registerReceiver(usbOnReciever,on);
+        BcncAPI.getContext().registerReceiver(usbOffReciever,off);
 
         // Display Doctor info : OPTION
-        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(MadamfiveAPI.getActivity());
+        doctorSelectExtraOption = SmartFiPreference.getSfInsertDoctorOpt(BcncAPI.getActivity());
         doctor_name = (TextView)view.findViewById(R.id.doctor_name);
         if(!doctorSelectExtraOption){
             btnDoctor.setVisibility(View.INVISIBLE);
             doctor_name.setVisibility(View.INVISIBLE);
         }else{
             HashMap<String,String> doctor = new HashMap<>();
-            String name = SmartFiPreference.getSfDoctorName(MadamfiveAPI.getActivity());
-            String number =SmartFiPreference.getSfDoctorNumber(MadamfiveAPI.getActivity());
+            String name = SmartFiPreference.getSfDoctorName(BcncAPI.getActivity());
+            String number =SmartFiPreference.getSfDoctorNumber(BcncAPI.getActivity());
             doctor.put("name", name);
             doctor.put("doctorNumber", number);
             selectedDoctor = doctor;
@@ -293,7 +293,7 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
             }
         }
 
-        shootingImageDisplayExtraOption = SmartFiPreference.getSfShootDisplayOpt(MadamfiveAPI.getActivity());
+        shootingImageDisplayExtraOption = SmartFiPreference.getSfShootDisplayOpt(BcncAPI.getActivity());
         if(shootingImageDisplayExtraOption){
             photo_container.setVisibility(View.VISIBLE);
         }
@@ -338,21 +338,21 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
 
     private void savePhotoNUpload(Bitmap picture, String phone, String mFileName) {
         Log.w(TAG,"savePhotoNUpload");
-        File file = new File(MadamfiveAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
+        File file = new File(BcncAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState())  + File.separator + mFileName);
 
         String srcPath = file.toString();
         String path = DisplayUtil.storePtictureNThumbImage(srcPath,
-                MadamfiveAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState()), mFileName, picture);
+                BcncAPI.getActivity().getExternalFilesDir(Environment.getExternalStorageState()), mFileName, picture);
 
         if(path != null){
-            PhotoModel photoModel = PhotoModelService.addPhotoModel(MadamfiveAPI.getActivity(), srcPath,path, mFileName, 0);
+            PhotoModel photoModel = PhotoModelService.addPhotoModel(BcncAPI.getActivity(), srcPath,path, mFileName, 0);
             Long id = photoModel.getId();
 //            Log.i("phone",id.toString());
-            PictureIntentService.startUploadPicture(MadamfiveAPI.getActivity(), path);
+            PictureIntentService.startUploadPicture(BcncAPI.getActivity(), path);
             photoList.add(0, photoModel);
             phoneCameraPhotoAdapter.notifyDataSetChanged();
         }else{
-            Toast.makeText(MadamfiveAPI.getActivity(), R.string.error_upload_image, Toast.LENGTH_SHORT);
+            Toast.makeText(BcncAPI.getActivity(), R.string.error_upload_image, Toast.LENGTH_SHORT);
         }
     }
 
@@ -370,7 +370,7 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
                 }
             }else{
 
-                Toast.makeText(MadamfiveAPI.getActivity(),getString(R.string.p_insert_patient),Toast.LENGTH_SHORT).show();
+                Toast.makeText(BcncAPI.getActivity(),getString(R.string.p_insert_patient),Toast.LENGTH_SHORT).show();
             }
 //            mSound = new MediaActionSound();
 //            mSound.play(MediaActionSound.SHUTTER_CLICK);
@@ -382,7 +382,7 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
     }
 
     private boolean isInsertPatient() {
-        if(SmartFiPreference.getSfPatientName(MadamfiveAPI.getActivity()).equals("")){
+        if(SmartFiPreference.getSfPatientName(BcncAPI.getActivity()).equals("")){
             return false;
         }else{
             return true;
@@ -418,7 +418,7 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
             ft.addToBackStack(null);
             ft.commit();
         }else{
-            Toast.makeText(MadamfiveAPI.getActivity(),getString(R.string.p_insert_patient),Toast.LENGTH_SHORT).show();
+            Toast.makeText(BcncAPI.getActivity(),getString(R.string.p_insert_patient),Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -493,8 +493,8 @@ private final BroadcastReceiver usbOnReciever = new BroadcastReceiver() {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(MadamfiveAPI.getActivity() !=null && MadamfiveAPI.getActivity() instanceof VrecordInterface){
-            mVrecInterface = (VrecordInterface)MadamfiveAPI.getActivity();
+        if(BcncAPI.getActivity() !=null && BcncAPI.getActivity() instanceof VrecordInterface){
+            mVrecInterface = (VrecordInterface) BcncAPI.getActivity();
         }
     }
 
