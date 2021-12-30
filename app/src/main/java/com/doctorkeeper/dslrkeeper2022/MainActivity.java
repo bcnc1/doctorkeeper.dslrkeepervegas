@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,9 @@ import com.doctorkeeper.dslrkeeper2022.view.log_in.LoginDialogFragment;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 
 public class MainActivity extends SessionActivity implements CameraListener {
@@ -94,8 +98,40 @@ public class MainActivity extends SessionActivity implements CameraListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String CheckFolderPath = getExternalFilesDir(null) + "/uploadCheck";
+//        Log.v(TAG,"CheckFolderPath : "+ CheckFolderPath);
+        File dir = new File(CheckFolderPath);
+        if(!dir.exists()){
+            Log.v(TAG,"CheckFolder not exists");
+            boolean wasSuccessful = dir.mkdirs();
+            if (!wasSuccessful) {
+                System.out.println("was not successful.");
+            }
+        }
+
         if (AppConfig.LOG) {
-            Log.i(TAG, "onCreate");
+            Log.i(TAG, "MainActivity onCreate");
+            String thumbPath = getExternalFilesDir(null) + "/mounted/thumbnail/";
+            String checkPath = getExternalFilesDir(null) + "/uploadCheck/";
+
+            File thumbDir = new File(thumbPath);
+            File checkDir = new File(checkPath);
+            if (checkDir.list().length!=0 && thumbDir.list().length!=0) {
+                List<String> checkList = Arrays.asList(Objects.requireNonNull(checkDir.list()));
+                List<String> thumbList = Arrays.asList(Objects.requireNonNull(thumbDir.list()));
+                boolean compareResult = checkList.containsAll(thumbList);
+                System.out.println("파일리스트 와 체크리스트 비교 : "+ compareResult);
+                Toast toast;
+                if (!compareResult) {
+                    toast = Toast.makeText(getBaseContext(), "업로드에 실패한 파일이 있습니다. \n리스트에서 재업로드 하시기 바랍니다.", Toast.LENGTH_LONG);
+                } else {
+                    toast = Toast.makeText(getBaseContext(), "Welcome!", Toast.LENGTH_SHORT);
+                }
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+
+
         }
 
         mCon = this;

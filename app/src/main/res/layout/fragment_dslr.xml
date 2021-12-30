@@ -165,7 +165,6 @@
                   android:layout_margin="5sp"
                   android:layout_marginTop="50dp"
                   android:paddingRight="300dp"
-                  android:background="@color/lightgrey"
                   android:src="@drawable/human2"
                   app:layout_constraintEnd_toEndOf="parent" />
 
