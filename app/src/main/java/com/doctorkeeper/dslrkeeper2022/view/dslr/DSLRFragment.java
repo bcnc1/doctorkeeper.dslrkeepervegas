@@ -79,6 +79,7 @@ import butterknife.OnClick;
 
 import static com.doctorkeeper.dslrkeeper2022.API.BlabAPI.shootingImageDisplayExtraOption;
 import static com.doctorkeeper.dslrkeeper2022.API.BcncAPI.selectedDoctor;
+import static com.loopj.android.http.AsyncHttpClient.log;
 
 public class DSLRFragment extends SessionFragment implements
         Camera.RetrieveImageListener,
@@ -318,6 +319,7 @@ public class DSLRFragment extends SessionFragment implements
 
     @OnClick(R.id.btn_cloud)
     public void cloudBtnClicked(){
+        Log.i(TAG, "btn_cloud clicked...");
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, CloudFragment.newInstance(), null);
         ft.addToBackStack(null);
@@ -515,7 +517,7 @@ public class DSLRFragment extends SessionFragment implements
     private void sendPhoto(int objectHandle, ObjectInfo info, Bitmap thumb, Bitmap bitmap) throws UnsupportedEncodingException {
 //        Log.d(TAG, "sendPhoto");
         currentObjectHandle = 0;
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
+        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmssSSS").format(new Date());
         String tnhPatientChart = SmartFiPreference.getPatientChart(BcncAPI.getContext());
         String tnhPatientId = SmartFiPreference.getSfPatientCustId(BcncAPI.getContext());
         mFileName = tnhPatientId+"_"+timeStamp+".jpg";
@@ -533,6 +535,7 @@ public class DSLRFragment extends SessionFragment implements
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             capturedImage2 = stream.toByteArray();
         }catch(Exception e){
+            log.e(TAG,"make thumbnail error : " + e);
         }
         String path = DisplayUtil.storePictureNThumbImage(srcPath, getActivity().getExternalFilesDir(Environment.getExternalStorageState()), mFileName, capturedImage2);
         Log.i(TAG,"path:"+path);

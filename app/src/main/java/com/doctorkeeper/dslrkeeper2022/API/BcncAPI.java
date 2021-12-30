@@ -538,17 +538,17 @@ public class BcncAPI {
     }
 
 
-    public static void getImageLists(Context con, JsonHttpResponseHandler handler) {
-        String url = Constants.Storage.BASE_URL;
-        String hostipalId = SmartFiPreference.getHospitalId(getContext());
-        final String urlTarget = url + "/" + hostipalId + "/?limit=1000&format=json";
-        String token = SmartFiPreference.getSfToken(getContext());
-        log.i(TAG, "url:::" + urlTarget);
-
-        client.addHeader("X-Auth-Token", token);
-        client.get(con, urlTarget, handler);
-
-    }
+//    public static void getImageLists(Context con, JsonHttpResponseHandler handler) {
+//        String url = Constants.Storage.BASE_URL;
+//        String hostipalId = SmartFiPreference.getHospitalId(getContext());
+//        final String urlTarget = url + "/" + hostipalId + "/?limit=1000&format=json";
+//        String token = SmartFiPreference.getSfToken(getContext());
+//        log.i(TAG, "url:::" + urlTarget);
+//
+//        client.addHeader("X-Auth-Token", token);
+//        client.get(con, urlTarget, handler);
+//
+//    }
 
 
     public static void login(String username, String password, final JsonHttpResponseHandler responseHandler) {
@@ -562,7 +562,7 @@ public class BcncAPI {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if (response.has("accessToken") == true) {
+                            if (response.has("accessToken")) {
                                 mAcccessToken = URLDecoder.decode(response.getString("accessToken"));
                                 SmartFiPreference.setSfToken(getActivity(),mAcccessToken);
 //                                write_mAcccessToken(mAcccessToken);

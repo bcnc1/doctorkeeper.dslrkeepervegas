@@ -22,6 +22,13 @@ import java.util.List;
 
 import com.bumptech.glide.Glide;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+
 
 public class CloudGalleryAdapter extends BaseAdapter {
 
@@ -30,7 +37,7 @@ public class CloudGalleryAdapter extends BaseAdapter {
     public static class ViewHolder {
         HashMap<String,String> photo;
         AspectRatioImageView image1;
-//        ImageView image1;
+        //        ImageView image1;
         TextView filename;
         TextView date;
         public TextView dslr;
@@ -40,7 +47,6 @@ public class CloudGalleryAdapter extends BaseAdapter {
         ProgressBar progressBar;
     }
 
-//    private List<PhotoModel> items;
     private List<HashMap<String,String>> items;
     private final LayoutInflater inflater;
     String accessToken;
@@ -95,6 +101,7 @@ public class CloudGalleryAdapter extends BaseAdapter {
         return position;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -109,35 +116,60 @@ public class CloudGalleryAdapter extends BaseAdapter {
             holder.date = (TextView) view.findViewById(R.id.date_field);
             holder.progressBar = (ProgressBar) view.findViewById(R.id.thumb_uploading);
             holder.thumbView = (ImageView) view.findViewById(R.id.thumb_uploaded);
-//            holder.dslr = (TextView) view.findViewById(R.id.textview_dslr);
+            holder.dslr = (TextView) view.findViewById(R.id.textview_dslr);
         }
 
         final ViewHolder holder = (ViewHolder) view.getTag();
         holder.photo = getItem(position);
-//        log.i("holder.photo.get(\"fileName\")", String.valueOf(holder.photo.get("fileName")));
-        String filename = holder.photo.get("fileName");
-        holder.progressBar.setVisibility(View.INVISIBLE);
-//        accessToken = SmartFiPreference.getSfToken(getContext());
+//        log.i(TAG,"holder.photo : " + holder.photo);
+//        if (holder.photo.get("cameraKind").equals("DSLR")) {                // 1 = DSLR
+//            holder.dslr.setVisibility(View.VISIBLE);
+//        }else if(holder.photo.get("cameraKind").equals("Video")){
+//            holder.dslr.setVisibility(View.VISIBLE);
+//            holder.dslr.setText("Video");
+//        }else {
+//            holder.dslr.setVisibility(View.INVISIBLE);
+//        }
 
-        String token = SmartFiPreference.getSfToken(BcncAPI.getActivity());
-        String hostipalId = SmartFiPreference.getHospitalId(BcncAPI.getActivity());
-        String imageUrl = Constants.Storage.BASE_URL+"/"+hostipalId+"/"+filename;
-        GlideUrl glideUrl = new GlideUrl(imageUrl, new LazyHeaders.Builder()
-                .addHeader("X-Auth-Token", token).build());
-        Glide.with(mContext).load(glideUrl).centerCrop().into(holder.image1);
+        holder.progressBar.setVisibility(View.INVISIBLE);
+//        accessToken = MadamfiveAPI.getAccessToken();
+
+//        String imageURL = Constants.m5.BASE_URL+"/v1/posts/"+holder.photo.getrl")+
+//                "/attachments/"+holder.photo.get("guid")+"?size=small&accessToken="+ URLEncoder.encode(accessToken);
+//        Log.i(TAG,"imageURL in Cloud"+imageURL);
+//        Picasso.get().load(imageURL).resize(120,120).centerCrop().into(holder.image1);
+        Glide.with(mContext).load(holder.photo.get("fullPath")).centerCrop().into(holder.image1);
         holder.image1.setExpectedDimensions(120, 120);
 
-        String d1 = holder.photo.get("fileName");
-        holder.date.setText("");
-        try {
-            String[] d2 = d1.split("_");
-            String d3 = d2[2];
-            String d4 = d3.substring(5, 15);
-            String d5 = d4.replaceAll("-", " ");
-            String d6 = d5.replaceFirst(" ", "-");
-            String d7 = d6.substring(0, 8) + ":" + d6.substring(8, 10);
-            holder.date.setText(d7);
-        }catch(Exception e){}
+        SimpleDateFormat df = new SimpleDateFormat("MM.dd HH:mm:ss");
+        String createdDate = df.format(Long.parseLong(holder.photo.get("uploadDate")));
+        holder.date.setText(createdDate);
+
+
+        String fullPath = holder.photo.get("fullPath");
+        String filename=fullPath.substring(fullPath.lastIndexOf("/")+1);
+        String checkPath = mContext.getExternalFilesDir(null).getAbsolutePath() + "/uploadCheck/";
+//        String checkPath = "/storage/emulated/0/Android/data/com.doctorkeeper.smartfi.tnh/files/uploadCheck/";
+        String checkFullPath = checkPath + filename;
+//        log.i(TAG,"파일이름 : " + checkFullPath);
+        holder.dslr = (TextView) view.findViewById(R.id.textview_dslr);
+        File files = new File(checkFullPath);
+        if(files.exists()) {
+//            log.i(TAG,"exists");
+            holder.dslr.setVisibility(View.VISIBLE);
+            holder.dslr.setBackgroundColor(Color.parseColor("#0080FF"));
+            holder.dslr.setText("성공");
+//            holder.filename.setText("success");
+        } else {
+//            log.i(TAG,"not exists");
+            holder.dslr.setVisibility(View.VISIBLE);
+            holder.dslr.setBackgroundColor(Color.parseColor("#F20F0F"));
+            holder.dslr.setText("실패");
+//            SmartFiPreference.setSfUploadResult(BlabAPI.getActivity(),true);
+//            log.i(TAG,"SmartFiPreference.getSfUploadResult(BlabAPI.getActivity()) : " + SmartFiPreference.getSfUploadResult(BlabAPI.getActivity()));
+//            holder.filename.setText("failed");
+        }
+
         holder.done = false;
 
         return view;

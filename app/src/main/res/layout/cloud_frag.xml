@@ -35,10 +35,12 @@
             android:layout_alignRight="@+id/cloud_detail_container"
             android:layout_gravity="center|left"
             android:layout_marginLeft="15dp"
-            android:background="@drawable/gohome" />
+            android:background="@drawable/gohome"
+            tools:ignore="RtlHardcoded" />
 
         <Button
             android:id="@+id/btn_setup"
+            android:visibility="gone"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignRight="@+id/cloud_detail_container"
@@ -62,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal|center"
         android:gravity="center"
-        android:text="클라우드에 업로드된 파일을 확인합니다"
+        android:text="휴대폰에 저장된 파일을 확인합니다"
         android:textSize="20dp"
         android:textColor="@color/black"
         android:fontFamily="@font/dangdang"
@@ -99,7 +101,7 @@
               android:orientation="vertical"
               app:layout_constraintBottom_toTopOf="@+id/linearLayout"
               app:layout_constraintTop_toBottomOf="@+id/top_layout"
-              tools:ignore="UnknownId">
+              tools:ignore="UnknownId,UnknownIdInLayout">
           </LinearLayout>
 
       </androidx.constraintlayout.widget.ConstraintLayout>
