@@ -544,6 +544,9 @@ public abstract class PtpCamera implements Camera {
             fullIn = ByteBuffer.allocate(fullInSize);
             fullIn.order(ByteOrder.LITTLE_ENDIAN);
 
+            Log.i(TAG, "connection.createInRequest()");
+
+
             r1 = connection.createInRequest();
             r2 = connection.createInRequest();
             r3 = connection.createInRequest();

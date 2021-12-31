@@ -165,7 +165,7 @@ public class PictureIntentService extends IntentService {
                 }
 
                 Log.i(TAG,"uploadImage => Finished");
-
+                deleteFiles();
             }
         });
 
@@ -182,14 +182,33 @@ public class PictureIntentService extends IntentService {
         Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
         Log.d(TAG, "Delete Size: "+ files.length);
         if(files.length > 50){
-            for (int i = 50; i < files.length; i++)
+            for (int i = 51; i < files.length; i++)
             {
                 Log.d(TAG, "Delete FileName:" + files[i].getAbsolutePath());
                 File file1 = files[i];
                 if(file1.isFile()){
                     File thumbnail = new File(files[i].getAbsolutePath().replace("/mounted/","/mounted/thumbnail/"));
-                    file1.delete();
-                    thumbnail.delete();
+                    File checkFile = new File(files[i].getAbsolutePath().replace("/mounted/","/uploadCheck/"));
+//                    file1.delete();
+//                    thumbnail.delete();
+//                    checkFile.delete();
+                    if(file1.delete()){
+                        System.out.println("원본 파일삭제 성공");
+                    }else{
+                        System.out.println("원본 파일삭제 실패");
+                    }
+
+                    if(thumbnail.delete()){
+                        System.out.println("썸네일 파일삭제 성공");
+                    }else{
+                        System.out.println("썸네일 파일삭제 실패");
+                    }
+
+                    if(checkFile.delete()){
+                        System.out.println("체크 파일삭제 성공");
+                    }else{
+                        System.out.println("체크 파일삭제 실패");
+                    }
                 }
 //                file1.delete();
             }

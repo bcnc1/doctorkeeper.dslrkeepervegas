@@ -1,5 +1,6 @@
 package com.doctorkeeper.dslrkeeper2022;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
@@ -95,6 +96,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
         return settings;
     }
 
+    @SuppressLint("ShowToast")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
