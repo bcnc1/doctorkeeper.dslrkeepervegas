@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.doctorkeeper.dslrkeeper2022.ptp;
+package com.doctorkeeper.dslrkeepervegas.ptp;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,22 +35,22 @@ import android.util.Log;
 
 //import org.acra.ErrorReporter;
 
-import com.doctorkeeper.dslrkeeper2022.AppConfig;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.CloseSessionCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.Command;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.GetDeviceInfoCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.GetDevicePropValueCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.GetObjectHandlesCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.GetStorageInfosAction;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.InitiateCaptureCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.OpenSessionCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.RetrieveImageAction;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.RetrieveImageInfoAction;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.RetrievePictureAction;
-import com.doctorkeeper.dslrkeeper2022.ptp.commands.SetDevicePropValueCommand;
-import com.doctorkeeper.dslrkeeper2022.ptp.model.DeviceInfo;
-import com.doctorkeeper.dslrkeeper2022.ptp.model.DevicePropDesc;
-import com.doctorkeeper.dslrkeeper2022.ptp.model.LiveViewData;
+import com.doctorkeeper.dslrkeepervegas.AppConfig;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.CloseSessionCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.Command;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.GetDeviceInfoCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.GetDevicePropValueCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.GetObjectHandlesCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.GetStorageInfosAction;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.InitiateCaptureCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.OpenSessionCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.RetrieveImageAction;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.RetrieveImageInfoAction;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.RetrievePictureAction;
+import com.doctorkeeper.dslrkeepervegas.ptp.commands.SetDevicePropValueCommand;
+import com.doctorkeeper.dslrkeepervegas.ptp.model.DeviceInfo;
+import com.doctorkeeper.dslrkeepervegas.ptp.model.DevicePropDesc;
+import com.doctorkeeper.dslrkeepervegas.ptp.model.LiveViewData;
 
 public abstract class PtpCamera implements Camera {
 
